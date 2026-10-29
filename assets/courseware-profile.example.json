@@ -1,0 +1,10 @@
+{
+  "type": "process",
+  "voiceMode": "required",
+  "quantityChart": "required",
+  "interactionLevel": "standard",
+  "offlineRequired": true,
+  "params": ["t", "voice", "simple"],
+  "publishMode": "local",
+  "knowledgeBase": ""
+}
