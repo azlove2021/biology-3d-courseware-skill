@@ -101,6 +101,7 @@ gh api repos/<owner>/<repo>/pages -X POST -f source[branch]=main -f source[path]
 - 本地：`001_project_减数分裂全流程时间轴/`
 - 在线：https://azlove2021.github.io/meiosis-3d-courseware/
 - 自检：`python scripts/check_courseware.py "<项目目录>"` → 0 阻断 / 0 警告
+- 技能仓库：https://github.com/azlove2021/biology-3d-courseware-skill
 
 ## 资源索引
 
