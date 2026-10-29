@@ -278,26 +278,30 @@ def check_static(report: Report, html: str, base: Path, profile: dict, html_path
     if not re.search(r"THREE\.", html):
         report.fail("static", "HTML 未发现 THREE 场景代码，疑似不是 3D 课件")
 
-    # 主题（v1.2 玻璃拟态驾驶舱）
-    for token in ("--sci", "--cyan", "--violet", "--ok", "--warn", "--bad",
-                  "--ink", "--glass", "--glass-blur", "--shadow-2",
-                  "--line", "--tint", "--r-panel"):
-        if token not in html:
-            report.warn("static", f"设计 token 缺失: {token}")
-    if profile.get("theme") == "glass" and "backdrop-filter" not in html:
-        report.fail("static", "glass 主题必须使用 backdrop-filter")
+    # 主题（v1.2 玻璃拟态驾驶舱；legacy 仅做基础检查）
     if "PingFang SC" not in html:
         report.warn("static", "字体栈缺少 PingFang SC")
-    if not re.search(r"clamp\(", html):
-        report.warn("static", "未见 clamp() 响应式尺寸")
-    if "因果链" not in html and "主线问题" not in html:
-        report.warn("static", "未见驾驶舱的「主线问题 / 因果链」")
-    if "本步" not in html or "中控台" not in html:
-        report.warn("static", "未见左栏「本步」或右栏「中控台」")
-    if not re.search(r"下一步|上一步", html):
-        report.warn("static", "未见「上一步 / 下一步」导航")
-    if "考核" not in html:
-        report.warn("static", "未见「考核」环节（最后一步应固定为考核）")
+    if profile.get("layout") == "legacy":
+        if "--accent" not in html and "--sci" not in html:
+            report.warn("static", "未发现主题色 token")
+    else:
+        for token in ("--sci", "--cyan", "--violet", "--ok", "--warn", "--bad",
+                      "--ink", "--glass", "--glass-blur", "--shadow-2",
+                      "--line", "--tint", "--r-panel"):
+            if token not in html:
+                report.warn("static", f"设计 token 缺失: {token}")
+        if profile.get("theme") == "glass" and "backdrop-filter" not in html:
+            report.fail("static", "glass 主题必须使用 backdrop-filter")
+        if not re.search(r"clamp\(", html):
+            report.warn("static", "未见 clamp() 响应式尺寸")
+        if "因果链" not in html and "主线问题" not in html:
+            report.warn("static", "未见驾驶舱的「主线问题 / 因果链」")
+        if "本步" not in html or "中控台" not in html:
+            report.warn("static", "未见左栏「本步」或右栏「中控台」")
+        if not re.search(r"下一步|上一步", html):
+            report.warn("static", "未见「上一步 / 下一步」导航")
+        if "考核" not in html:
+            report.warn("static", "未见「考核」环节（最后一步应固定为考核）")
 
     # 专业性
     if "示意" not in html and "非真实比例" not in html:
