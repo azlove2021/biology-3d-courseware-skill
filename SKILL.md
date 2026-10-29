@@ -178,7 +178,8 @@ python tests/test_checker.py                                  # 改脚本后必�
 | `scripts/check_courseware.py` | 三层校验（静态/数据/运行） |
 | `scripts/smoke_test.py` | 可选 Playwright 冒烟测试 |
 | `tests/test_checker.py` | 校验脚本的故障样例回归 |
-| `assets/courseware-shell.html` | 驾驶舱外壳模板（v1.2） |
+| `assets/courseware-shell.html` | v1.1 旧版外壳（六块面板，兼容参考） |
+| `demo/gene-expression/` | v1.2 驾驶舱样板（可直接复制改内容） |
 | `assets/courseware-profile.example.json` | 配置样例 |
 
 ## 参考实现
