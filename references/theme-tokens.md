@@ -1,137 +1,214 @@
-# 主题与排版规范（锁定）
+# 主题与排版规范（玻璃拟态教学驾驶舱）
 
-所有课件沿用同一套设计语言。**只允许改主强调色**，其余 token、背景、布局、圆角、阴影、断点一律不动。
+设计语言参考 **铜匠实验室**（<https://lab.tongjiang.app>，CC BY-NC 4.0）的公开课件。**只借鉴布局、配色与组件语言，不复制其课件代码、文案与素材。**
 
-## 1. 语义色板
+核心特征：**浅色 3D 场景 + 悬浮玻璃面板 + 顶部因果链 + 左侧本步脚本 + 右侧中控台 + 底部步骤条**。所有面板半透明白、带背景模糊与柔和蓝紫阴影，信息密度高但不拥挤。
+
+## 1. 核心 token
 
 ```css
 :root{
-  /* 语义色：全系列通用，不要改 */
-  --red:#ef4444;    /* 父源 / 阳性 / 警示 */
-  --blue:#3b82f6;   /* 母源 / 对照 */
-  --purple:#7c3aed; /* 结构 / 四分体 / 主结构 */
-  --cyan:#06b6d4;   /* 纺锤丝 / 过程 / 辅助 */
-  --orange:#f59e0b; /* 易错点 / 注意 */
-  --ink:#1e293b;    /* 正文 */
-  --muted:#64748b;  /* 次要文字 */
-  --line:#e2e8f0;   /* 描边 */
-  /* 主强调色：每课可换，见下表 */
-  --accent:#7c3aed;
-  --accent2:#06b6d4;
+  --font:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","Hiragino Sans GB",system-ui,sans-serif;
+  --num:"SF Pro Display","DIN Alternate","Helvetica Neue","PingFang SC",system-ui,sans-serif;
+
+  /* 玻璃面板 */
+  --glass:rgba(255,255,255,.84);
+  --glass-bar:rgba(255,255,255,.72);
+  --glass-2:rgba(255,255,255,.76);
+  --glass-back:rgba(255,255,255,.95);
+  --glass-solid:rgba(255,255,255,.92);
+  --glass-blur:blur(12px) saturate(150%);
+  --glass-edge:1px solid rgba(255,255,255,.75);
+  --glass-glow:inset 0 1px 0 rgba(255,255,255,.9);
+
+  /* 阴影与描边 */
+  --shadow-1:0 2px 8px rgba(30,50,110,.08);
+  --shadow-2:0 10px 32px rgba(30,50,110,.14);
+  --tint:#F3F7FF;
+  --line:rgba(14,26,43,.08);
+  --line-2:rgba(14,26,43,.25);
+  --line-soft:rgba(14,26,43,.06);
+
+  /* 文字 */
+  --ink:#0E1A2B; --ink2:#43526A; --ink3:#56627A;
+
+  /* 主色 / 状态色（只做面、条、点、图标） */
+  --sci:#2F6BFF; --cyan:#13B8C6; --violet:#7C5CFF;
+  --grad:linear-gradient(100deg,#2F6BFF 0%,#13B8C6 100%);
+  --grad-soft:linear-gradient(100deg,rgba(47,107,255,.12) 0%,rgba(19,184,198,.12) 100%);
+  --ok:#10B981; --warn:#F59E0B; --bad:#EF4444;
+  --heat:linear-gradient(90deg,#F59E0B,#EF4444);
+
+  /* 主色透明度梯度 */
+  --sci-30:rgba(47,107,255,.30); --sci-12:rgba(47,107,255,.12);
+  --sci-8:rgba(47,107,255,.08);  --sci-4:rgba(47,107,255,.04);
+  --ok-12:rgba(16,185,129,.12);  --warn-10:rgba(245,158,11,.10);
+  --bad-12:rgba(239,68,68,.12);
+
+  /* 形状 */
+  --r-panel:16px; --r-card:12px; --r-ctrl:10px; --r-pill:999px;
+
+  /* 尺寸 */
+  --top-h:78px; --steps-h:46px; --foot-h:52px;
+  --panelw-l:clamp(320px,22vw,404px);
+  --panelw-r:clamp(300px,20.5vw,348px);
+  --fs-main:34px; --fs-sub:20px; --fs-t:13px; --fs-b:13px; --fs-xs:12px;
 }
 ```
 
-**颜色语义必须写进图例**，并注明「颜色仅用于区分来源/结构，非真实颜色」。
+## 2. 单元色系统
 
-## 2. 每课主色映射（只改这两个变量）
+每门课 2–5 个「单元」，每个单元一组颜色。只改 `--uc / --ucs / --ucg / --ucsg / --uh` 五个变量，组件自动跟随。
 
-| 主题域 | --accent | --accent2 | 适用 |
+| 单元 | `--uc` 主色 | `--ucs` 深色 | `--uh` 光晕 |
 |---|---|---|---|
-| 减数分裂 / 遗传规律 | `#7c3aed` 紫 | `#06b6d4` 青 | S-01、分离定律、自由组合 |
-| 光合 / 呼吸 / 代谢 | `#16a34a` 绿 | `#06b6d4` 青 | 光合作用、细胞呼吸、酶 |
-| 细胞结构 / 物质运输 | `#2563eb` 蓝 | `#7c3aed` 紫 | 细胞器、膜运输、细胞核 |
-| 发酵 / 工程 / 技术 | `#ea580c` 橙 | `#0891b2` 深青 | 发酵工程、基因工程 |
-| 稳态 / 调节 | `#9333ea` 紫红 | `#e11d48` 玫红 | 神经调节、体液调节、免疫 |
-| 生态 / 种群 | `#059669` 绿 | `#0ea5e9` 天蓝 | 种群、群落、生态系统 |
-
-> 换色后必须同步改 `.c1/.c2/.c3` 三张读数卡与曲线颜色，保持同域一致。
-
-## 3. 背景配方（禁止纯白大平面）
+| 青（细胞核/转录） | `#0D7A8C` | `#0B6979` | `rgba(13,122,140,.10)` |
+| 蓝（细胞质/翻译） | `#2F6BFF` | `#1E4FD6` | `rgba(47,107,255,.08)` |
+| 紫（分子细节） | `#9333EA` | `#7C2BC4` | `rgba(147,51,234,.10)` |
+| 橙（实验/操作） | `#D97706` | `#B45309` | `rgba(217,119,6,.10)` |
+| 绿（结论/生态） | `#057A55` | `#046A4A` | `rgba(5,122,85,.10)` |
 
 ```css
-body{
-  margin:0;color:var(--ink);overflow:hidden;
-  font:14px/1.7 "Microsoft YaHei","PingFang SC",sans-serif;
-  background:#f6f9ff;
-}
-.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.bg::before{
-  content:'';position:absolute;inset:-20%;
-  background:
-    radial-gradient(38% 42% at 16% 12%, rgba(196,181,253,.55), transparent 70%),
-    radial-gradient(42% 46% at 86% 18%, rgba(125,211,252,.55), transparent 72%),
-    radial-gradient(46% 50% at 74% 88%, rgba(167,243,208,.42), transparent 72%),
-    radial-gradient(40% 44% at 10% 84%, rgba(251,207,232,.40), transparent 72%),
-    linear-gradient(135deg,#fbfdff 0%,#f2f7ff 45%,#f6fbff 100%);
-}
-.bg::after{
-  content:'';position:absolute;inset:0;
-  background-image:radial-gradient(rgba(99,102,241,.20) 1px, transparent 1px);
-  background-size:22px 22px;
-  mask-image:radial-gradient(ellipse 75% 65% at 50% 45%, #000 30%, transparent 78%);
-  -webkit-mask-image:radial-gradient(ellipse 75% 65% at 50% 45%, #000 30%, transparent 78%);
-  opacity:.55;
-}
-.blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;animation:float 18s ease-in-out infinite}
-.blob.b1{width:420px;height:420px;left:-120px;top:-140px;background:#ddd6fe}
-.blob.b2{width:360px;height:360px;right:-100px;top:6%;background:#bae6fd;animation-delay:-6s}
-.blob.b3{width:320px;height:320px;left:38%;bottom:-160px;background:#bbf7d0;animation-delay:-11s}
-@keyframes float{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(18px,-22px,0) scale(1.06)}}
+.unit-1{--uc:#0D7A8C;--ucs:#0B6979;--ucg:linear-gradient(100deg,#0D7A8C,#13B8C6);--uh:rgba(13,122,140,.10)}
+.unit-2{--uc:#2F6BFF;--ucs:#1E4FD6;--ucg:var(--grad);--uh:var(--sci-8)}
+.unit-3{--uc:#9333EA;--ucs:#7C2BC4;--ucg:linear-gradient(100deg,#9333EA,#7C5CFF);--uh:rgba(147,51,234,.10)}
 ```
 
-## 4. 布局骨架
-
-```
-#app (flex column, height 100%)
-├─ header  高约 56px：mark + 标题/副标题 + badge + spacer + 语音/简洁/全屏/复位/重置
-├─ main (flex:1, flex row, min-height:0)
-│  ├─ #stage (flex:1, position:relative)
-│  │   ├─ #labels（投影标签层）
-│  │   ├─ .rail（顶部阶段导航，按大阶段分组，组间 .sep）
-│  │   ├─ .hud.tl（左上：模型名 + 起点→终点 + 非真实比例）
-│  │   ├─ .hud.tr（右上：示意 chip）
-│  │   ├─ .hud.bl（左下：图例 + 颜色说明）
-│  │   └─ .hud.br（右下：操作提示）
-│  └─ aside 宽 372px：六张 .card
-└─ footer：播放/暂停 + 上一/下一 + 时间轴 + 开关 + 速度
-```
-
-- `aside` 宽 **372px**（≤1180px 收窄到 330px）
-- 卡片：`border-radius:14px`，`box-shadow:0 5px 18px rgba(30,41,59,.055)`
-- 按钮：`border-radius:10px`；主按钮用 `linear-gradient(135deg,var(--accent),var(--accent2))`
-- 圆角体系：卡片 14 / 按钮 10 / 标签 999 / 读数卡 11
-
-## 5. 右侧面板六块（顺序固定）
-
-| # | 卡片 | 内容 | 视觉标记 |
-|---|---|---|---|
-| 1 | 阶段标题 + 讲解 | 阶段名、副标题、旁白、朗读按钮 + 自动朗读 + 语速 | `.narration` 左侧 3px 紫色竖线 |
-| 2 | 实时读数 | 染色体 / DNA / 染色单体 三色卡 + 口径说明 + 细胞数 | `.c1` 紫、`.c2` 青、`.c3` 橙 |
-| 3 | 数量曲线 | 三条折线（染色体/DNA/染色单体），当前阶段游标 | 高 96px，图例在右上 |
-| 4 | 本时期要点 | 折叠 `<details>`，避免一屏堆字 | 默认收起 |
-| 5 | 易错点 | 橙底卡片 `#fffdf7 → #fffbeb`，左侧 4px 橙边 | `.warn` |
-| 6 | 观察任务 | 绿底卡片 `#f7fffd → #effcf9`，左侧 4px 绿边 | `.task` |
-
-## 6. 响应式
+## 3. 玻璃面板配方
 
 ```css
-@media(max-width:1180px){ aside{width:330px} .rail button{padding:5px 7px;font-size:11px} }
-@media(max-width:980px){
-  main{flex-direction:column;min-height:0}
-  #stage{flex:1 1 auto;min-height:42vh}
-  aside{display:block;position:static;width:auto;max-height:46vh;
-    border-left:0;border-top:1px solid var(--line);box-shadow:none}
-  .hud.br{display:none}
-  .rail{max-width:calc(100% - 24px);overflow-x:auto}
+.panel{
+  background:var(--glass);
+  border:var(--glass-edge);
+  border-radius:var(--r-panel);
+  box-shadow:var(--shadow-2),var(--glass-glow);
+  backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);
 }
 ```
 
-**≤980px 必须上下堆叠**，不允许把讲解面板直接隐藏。
+- 顶部栏/底部栏用 `--glass-bar`（更透，72%）
+- 浮层/弹窗用 `--glass-back`（95%，保证可读）
+- **低帧率降级**：`body.lowfps .panel{background:var(--glass-solid);backdrop-filter:none}`
 
-## 7. 简洁模式（投影必备）
+## 4. 字体与字号
+
+- 正文 13px / 1.5；辅助 12px；极小 11px
+- 主标题 34px / 800（`--fs-main`）；副标题 20px（`--fs-sub`）
+- 面板标题 13px / 700；读数数字 20–28px，用 `--num` + `font-variant-numeric:tabular-nums`
+- 步骤号 20px / 800；因果链标签 12px / 650
+- 不用衬线体；不写超长段落，单行 ≤ 28 个汉字
+
+## 5. 组件
+
+### 按钮
 
 ```css
-body.simple .blob{display:none}
-body.simple .bg::after{display:none}
-body.simple .bg::before{background:#f8fbff}
-body.simple .card{box-shadow:none}
+.btn{
+  appearance:none;border:1px solid var(--line);background:var(--glass);
+  border-radius:var(--r-ctrl);padding:5px 9px;line-height:1.1;color:var(--ink);
+  display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+  backdrop-filter:var(--glass-blur);
+}
+.btn:hover{border-color:var(--sci);background:var(--sci-4)}
+.btn.pri{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 2px 10px var(--sci-30)}
+.btn.on{background:var(--grad);border-color:transparent;color:#fff}
+.btn.done{background:var(--ok-12);border-color:rgba(16,185,129,.35);color:#047857}
+.btn.warn{background:var(--warn-10);border-color:rgba(245,158,11,.40);color:#9A4507}
+.btn.danger{background:var(--bad-12);border-color:rgba(239,68,68,.30);color:#B91C1C}
 ```
 
-按钮文案：`◐ 简洁模式` ↔ `◑ 关闭简洁`。
+### 标签 / 因果链
 
-## 8. 字体与动效
+```css
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 9px;border-radius:var(--r-pill);
+  border:1px solid var(--line);background:var(--glass);
+  font-size:12px;font-weight:650;color:var(--ink2);
+}
+.chip .dot{width:6px;height:6px;border-radius:50%;background:var(--uc)}
+.chip.on{background:var(--uh);border-color:var(--uc);color:var(--ucs)}
+```
 
-- 字体：`"Microsoft YaHei","PingFang SC",sans-serif`；正文 14px / 1.7
-- 阶段名 21px / 800；副标题 12px；旁白 12.5px / 1.75
-- 过渡统一 `.15s`；卡片不跳动；3D 相机缓动 `lerp(…, min(1, dt*3.2))`
-- 禁止：大面积纯白、纯黑、荧光色、超过 3 种强调色同屏
+### 步骤条
+
+```css
+.steps{display:flex;align-items:center;gap:4px;padding:0 10px;height:var(--steps-h)}
+.step{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--r-pill);
+  font-size:12px;color:var(--ink3);border:1px solid transparent;background:transparent;
+}
+.step .n{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;
+  font-size:11px;font-weight:800;background:var(--line-soft);color:var(--ink3)}
+.step.done .n{background:var(--ok-12);color:#047857}
+.step.on{background:var(--grad);color:#fff;box-shadow:0 2px 10px var(--sci-30)}
+.step.on .n{background:rgba(255,255,255,.22);color:#fff}
+.step .line{width:18px;height:1px;background:var(--line)}
+```
+
+### 读数卡 / 滑块
+
+```css
+.readout{background:var(--glass-2);border:1px solid var(--line);border-radius:var(--r-card);padding:8px 10px}
+.readout b{display:block;font:800 22px/1.1 var(--num);color:var(--uc);font-variant-numeric:tabular-nums}
+.readout span{font-size:11px;color:var(--ink3)}
+
+.sl{display:flex;flex-direction:column;gap:5px}
+.sl .top{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2)}
+.sl input[type=range]{appearance:none;height:6px;border-radius:3px;background:var(--line)}
+.sl input[type=range]::-webkit-slider-thumb{
+  appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--glass-back);border:2px solid var(--sci);box-shadow:var(--shadow-1);
+}
+```
+
+### 浮动标签（3D 场景内）
+
+```css
+.tag{
+  position:absolute;transform:translate(-50%,-50%);
+  padding:4px 9px;border-radius:var(--r-pill);
+  background:var(--glass-back);border:1px solid var(--glass-edge);
+  box-shadow:var(--shadow-1);font-size:11.5px;font-weight:650;color:var(--ink2);
+  white-space:nowrap;pointer-events:none;
+}
+```
+
+## 6. 布局尺寸（1600×900 参考）
+
+| 区域 | 尺寸 / 位置 |
+|---|---|
+| 外边距 | 四周 10px |
+| 顶栏 `#top` | 左右 10px，top 6px，高 **78px**，玻璃条 |
+| 因果链 | 顶栏内第二行，高约 30px |
+| 步骤条 `.steps` | 左右 10px，top 90px，高 **46px** |
+| 左栏 `aside.left` | left 10px，top 144px，宽 `clamp(320px,22vw,404px)`，高至底栏上方 |
+| 右栏 `aside.right` | right 10px，top 144px，宽 `clamp(300px,20.5vw,348px)` |
+| 中央 3D | 左栏右缘到右栏左缘，顶部步骤条下缘到底栏上缘 |
+| 底栏 `.foot` | 左右 10px，bottom 10px，高 **52px** |
+
+- 面板间距 10px；卡片内边距 10–12px
+- 中央 3D 必须留出至少 **560px** 宽的可视区；小于 1100px 时左栏可折叠为抽屉
+- 不出现页面滚动条；所有内容在一屏内
+
+## 7. 背景
+
+- 页面底色 `--tint:#F3F7FF`
+- 3D 场景背景用浅色径向渐变：`radial-gradient(1200px 700px at 60% 20%, #FFFFFF, #EDF4FF 60%, #E6F0FB)`
+- 可叠加极淡点阵（`radial-gradient(rgba(47,107,255,.10) 1px, transparent 1px)`，22px 网格，opacity .35）
+- 禁止大面积深色、纯白、荧光色；玻璃面板后面必须有内容/渐变，否则 blur 无意义
+
+## 8. 禁止项
+
+- 不要复制铜匠实验室的 logo、插图、文案、课程数据
+- 不要把所有面板做成不透明纯白（失去玻璃层次）
+- 不要超过 3 个强调色同屏；单元色只用于该单元相关元素
+- 不要用 14px 以上正文；驾驶舱信息密度高，字号过大会溢出
+- 不要让 3D 场景被面板完全遮住；中央可视区是主角
+
+## 9. 出处
+
+- 设计语言参考：铜匠实验室 <https://lab.tongjiang.app>（CC BY-NC 4.0）
+- 仅借鉴布局、配色、组件语言；代码、素材、文案均为自研
+- 若对外发布，请在 README 注明「设计语言参考铜匠实验室」

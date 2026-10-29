@@ -5,3 +5,7 @@ __pycache__/
 Thumbs.db
 dist/
 *.zip
+
+# 本地测试产物
+_smoke/
+_landing.png

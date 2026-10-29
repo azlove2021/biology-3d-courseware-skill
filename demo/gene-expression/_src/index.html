@@ -1,0 +1,1183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>基因的表达：转录与翻译 · 3D 互动课件</title>
+<style>
+:root{
+  --font:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","Hiragino Sans GB",system-ui,sans-serif;
+  --num:"SF Pro Display","DIN Alternate","Helvetica Neue","PingFang SC",system-ui,sans-serif;
+  --glass:rgba(255,255,255,.84); --glass-bar:rgba(255,255,255,.72); --glass-2:rgba(255,255,255,.76);
+  --glass-back:rgba(255,255,255,.95); --glass-solid:rgba(255,255,255,.92);
+  --glass-blur:blur(12px) saturate(150%);
+  --glass-edge:1px solid rgba(255,255,255,.75);
+  --glass-glow:inset 0 1px 0 rgba(255,255,255,.9);
+  --shadow-1:0 2px 8px rgba(30,50,110,.08); --shadow-2:0 10px 32px rgba(30,50,110,.14);
+  --tint:#F3F7FF; --line:rgba(14,26,43,.08); --line-2:rgba(14,26,43,.25);
+  --ink:#0E1A2B; --ink2:#43526A; --ink3:#56627A;
+  --sci:#2F6BFF; --cyan:#13B8C6; --violet:#7C5CFF;
+  --grad:linear-gradient(100deg,#2F6BFF 0%,#13B8C6 100%);
+  --ok:#10B981; --warn:#F59E0B; --bad:#EF4444;
+  --sci-30:rgba(47,107,255,.30); --sci-12:rgba(47,107,255,.12); --sci-8:rgba(47,107,255,.08); --sci-4:rgba(47,107,255,.04);
+  --ok-12:rgba(16,185,129,.12); --warn-10:rgba(245,158,11,.10); --bad-12:rgba(239,68,68,.12);
+  --r-panel:16px; --r-card:12px; --r-ctrl:10px; --r-pill:999px;
+  --top-h:78px; --steps-h:46px; --foot-h:52px;
+  --panelw-l:clamp(320px,22vw,404px); --panelw-r:clamp(300px,20.5vw,348px);
+  --uc:#0D7A8C; --ucs:#0B6979; --uh:rgba(13,122,140,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--tint)}
+body{
+  font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(1200px 700px at 58% 18%,#FFFFFF 0%,#EDF4FF 55%,#E6F0FB 100%),
+    var(--tint);
+}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(rgba(47,107,255,.10) 1px,transparent 1px);
+  background-size:22px 22px;opacity:.30;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 45%,#000 30%,transparent 80%);
+}
+#gl{position:fixed;inset:0;z-index:1;display:block}
+#labels{position:fixed;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+.tag{
+  position:absolute;transform:translate(-50%,-50%);white-space:nowrap;
+  padding:4px 9px;border-radius:var(--r-pill);background:var(--glass-back);
+  border:1px solid var(--glass-edge);box-shadow:var(--shadow-1);
+  font-size:11.5px;font-weight:650;color:var(--ink2);pointer-events:none;
+}
+.panel{
+  background:var(--glass);border:var(--glass-edge);border-radius:var(--r-panel);
+  box-shadow:var(--shadow-2),var(--glass-glow);backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);
+}
+#top{position:fixed;left:10px;right:10px;top:6px;height:var(--top-h);z-index:20;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;padding:5px 12px}
+.toprow{display:flex;align-items:center;gap:9px;min-width:0}
+.brand{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.mark{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:#fff;
+  font-weight:800;font-size:12px;background:var(--grad);box-shadow:0 4px 12px var(--sci-30)}
+.brand h1{margin:0;font-size:17px;font-weight:800;letter-spacing:.2px}
+.brand p{margin:0;font-size:10.5px;color:var(--ink3)}
+.mq{display:flex;align-items:center;gap:6px;min-width:0;max-width:560px;font-size:12px;color:var(--ink2)}
+.mq>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp{flex:1}
+.status{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--ink3)}
+.status i{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-12)}
+.score{font-size:11px;color:var(--ink3)}
+.score b{font:800 14px var(--num);color:var(--sci);font-variant-numeric:tabular-nums}
+.btn{appearance:none;border:1px solid var(--line);background:var(--glass);border-radius:var(--r-ctrl);
+  padding:5px 9px;line-height:1.1;color:var(--ink);display:inline-flex;align-items:center;gap:5px;
+  white-space:nowrap;cursor:pointer;font-size:12px;backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);transition:.15s}
+.btn:hover{border-color:var(--sci);background:var(--sci-4)}
+.btn.pri{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 2px 10px var(--sci-30)}
+.btn.on{background:var(--grad);border-color:transparent;color:#fff}
+.btn.danger{background:var(--bad-12);border-color:rgba(239,68,68,.30);color:#B91C1C}
+.btn kbd{font:12px var(--num);padding:0 3px;border-radius:4px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.25)}
+kbd{font:11px var(--num);padding:0 3px;border-radius:4px;background:var(--tint);border:1px solid var(--line);color:var(--ink3)}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:var(--r-pill);
+  border:1px solid var(--line);background:var(--glass-2);font-size:11px;font-weight:650;color:var(--ink2)}
+.chip.violet{color:var(--violet);border-color:rgba(124,92,255,.25);background:rgba(124,92,255,.08)}
+.chip.on{background:var(--ok-12);border-color:rgba(16,185,129,.35);color:#047857}
+.chain{display:flex;align-items:center;gap:3px;overflow:hidden;font-size:11px}
+.chain .item{display:flex;align-items:center;gap:4px;padding:2px 7px;border-radius:var(--r-pill);
+  border:1px solid transparent;color:var(--ink3);white-space:nowrap}
+.chain .item .dot{width:5px;height:5px;border-radius:50%;background:var(--line-2)}
+.chain .item b{font-weight:700}
+.chain .item small{font-size:9.5px;color:var(--ink3);opacity:.8}
+.chain .item.on{background:var(--uh);border-color:var(--uc);color:var(--ucs)}
+.chain .item.on .dot{background:var(--uc)}
+.chain .arrow{color:var(--ink3);opacity:.5;font-size:10px}
+.steps{position:fixed;left:10px;right:10px;top:90px;height:var(--steps-h);z-index:20;
+  display:flex;align-items:center;gap:1px;padding:0 10px;overflow-x:auto;scrollbar-width:none}
+.steps::-webkit-scrollbar{display:none}
+.step{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:var(--r-pill);
+  border:1px solid transparent;background:transparent;color:var(--ink3);font-size:11.5px;cursor:pointer;white-space:nowrap}
+.step .n{width:17px;height:17px;border-radius:50%;display:grid;place-items:center;
+  font-size:10px;font-weight:800;background:var(--line-soft);color:var(--ink3)}
+.step.done .n{background:var(--ok-12);color:#047857}
+.step.on{background:var(--grad);color:#fff;box-shadow:0 2px 10px var(--sci-30)}
+.step.on .n{background:rgba(255,255,255,.22);color:#fff}
+.step .line{width:14px;height:1px;background:var(--line)}
+.left{position:fixed;left:10px;top:144px;bottom:72px;width:var(--panelw-l);z-index:15;
+  overflow-y:auto;padding:10px 12px}
+.right{position:fixed;right:10px;top:144px;bottom:72px;width:var(--panelw-r);z-index:15;
+  overflow-y:auto;padding:10px 12px}
+.left::-webkit-scrollbar,.right::-webkit-scrollbar{width:6px}
+.left::-webkit-scrollbar-thumb,.right::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
+.phead{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
+.kicker{font-size:11px;font-weight:800;letter-spacing:.6px;color:var(--ucs)}
+.crumb{font-size:9.5px;color:var(--ink3);letter-spacing:.2px}
+.stepq{display:flex;gap:8px;align-items:flex-start;margin:2px 0 5px}
+.stepq .num{font:800 20px/1 var(--num);color:var(--uc);flex:0 0 auto}
+.stepq h2{margin:0;font-size:14px;line-height:1.45;font-weight:800}
+.scene{margin:0 0 7px;font-size:11.5px;line-height:1.6;color:var(--ink3)}
+.try{display:flex;align-items:center;justify-content:space-between;margin:7px 0 3px}
+.instruction{margin:0 0 6px;font-size:11.5px;line-height:1.6;color:var(--ink2)}
+.expect{background:var(--sci-8);border-left:3px solid var(--sci);border-radius:0 8px 8px 0;
+  padding:6px 8px;font-size:11.5px;line-height:1.6;color:#1E4FD6}
+.expect b{font-weight:800}
+.conclusion{margin-top:7px;background:var(--ok-12);border-left:3px solid var(--ok);
+  border-radius:0 8px 8px 0;padding:6px 8px;font-size:11.5px;line-height:1.6;color:#047857}
+.hintline{font-size:10.5px;color:var(--ink3);margin-top:5px;text-align:center}
+.mini{margin-top:7px;border-top:1px solid var(--line);padding-top:6px;font-size:11px;color:var(--ink2)}
+.mini b{display:block;font-size:10.5px;color:var(--ink3);margin-bottom:3px;font-weight:800}
+.mini ul{margin:0;padding-left:14px;line-height:1.6}
+.mini.warnbox{background:var(--warn-10);border-left:3px solid var(--warn);border-radius:0 8px 8px 0;padding:6px 8px;border-top:0}
+.mini.warnbox b{color:#9A4507}
+.mini.exam{background:rgba(124,92,255,.07);border-left:3px solid var(--violet);border-radius:0 8px 8px 0;padding:6px 8px;border-top:0}
+.mini.exam b{color:var(--violet)}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;padding-top:8px;border-top:1px solid var(--line);font-size:10px;color:var(--ink3)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend i{width:8px;height:8px;border-radius:3px;display:inline-block}
+.actions{display:flex;gap:6px;margin:8px 0 6px}
+.units{display:flex;gap:4px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:7px;margin-top:6px}
+.unit{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:var(--r-pill);
+  border:1px solid var(--line);background:var(--glass-2);font-size:10.5px;color:var(--ink3);cursor:pointer}
+.unit.on{background:var(--uh);border-color:var(--uc);color:var(--ucs)}
+.readouts{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:4px 0 8px}
+.readout{background:var(--glass-2);border:1px solid var(--line);border-radius:var(--r-card);padding:6px 7px}
+.readout b{display:block;font:800 20px/1.1 var(--num);color:var(--uc);font-variant-numeric:tabular-nums}
+.readout span{font-size:9.5px;color:var(--ink3)}
+.sl{margin:7px 0}
+.sl .top{display:flex;justify-content:space-between;font-size:11px;color:var(--ink2);margin-bottom:3px}
+.sl .top b{font-weight:700;color:var(--ink)}
+.sl input[type=range]{appearance:none;width:100%;height:6px;border-radius:3px;background:var(--line);cursor:pointer}
+.sl input[type=range]::-webkit-slider-thumb{appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--glass-back);border:2px solid var(--sci);box-shadow:var(--shadow-1)}
+.sl .scale{display:flex;justify-content:space-between;font-size:9px;color:var(--ink3);margin-top:2px}
+.toggles{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0}
+.tg{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:var(--ink3);
+  padding:3px 6px;border:1px solid var(--line);border-radius:var(--r-pill);cursor:pointer;background:var(--glass-2)}
+.tg input{accent-color:var(--sci);width:12px;height:12px}
+.chartbox{margin-top:8px;border-top:1px solid var(--line);padding-top:7px}
+.chart-head{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;color:var(--ink2);margin-bottom:3px}
+.chart-head b{font-weight:800}
+#chart{width:100%;height:78px;display:block}
+.presets{display:flex;gap:5px;margin-top:8px}
+.presets .btn{flex:1;justify-content:center;font-size:11px}
+.foot{position:fixed;left:10px;right:10px;bottom:10px;height:var(--foot-h);z-index:20;
+  display:flex;align-items:center;gap:8px;padding:0 10px;font-size:10.5px;color:var(--ink3)}
+.counter{font-size:11px;color:var(--ink2);white-space:nowrap}
+.counter b{font:800 13px var(--num);color:var(--sci)}
+.disclaimer{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink3)}
+.keys{white-space:nowrap;color:var(--ink3);opacity:.8}
+.eqb{position:fixed;left:50%;bottom:74px;transform:translateX(-50%);z-index:14;
+  display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:var(--r-card);
+  background:var(--glass-2);border:var(--glass-edge);box-shadow:var(--shadow-1);
+  backdrop-filter:var(--glass-blur);font-size:11px;color:var(--ink2)}
+.eqb b{color:var(--ucs);font-weight:800;white-space:nowrap}
+.eqb span{white-space:nowrap}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(14,26,43,.35);backdrop-filter:blur(4px);
+  display:grid;place-items:center;padding:20px}
+.modal[hidden]{display:none}
+.quizcard{width:min(560px,92vw);max-height:86vh;overflow:auto;padding:14px 18px;background:var(--glass-back)}
+.qhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.qhead b{font-size:15px}
+.q{margin:9px 0;padding-top:7px;border-top:1px solid var(--line);font-size:12px}
+.q:first-child{border-top:0}
+.opt{display:flex;gap:6px;align-items:flex-start;margin:4px 0;color:var(--ink2);cursor:pointer;font-size:11.5px}
+.opt input{accent-color:var(--sci);margin-top:2px}
+.why{margin-top:5px;font-size:11px;line-height:1.55;color:var(--ink3)}
+.why.ok{color:#047857}
+.why.bad{color:#B91C1C}
+.qfoot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-size:11px}
+.help-list{margin:6px 0 0 16px;padding:0;font-size:11.5px;line-height:1.8;color:var(--ink2)}
+body[data-unit="0"]{--uc:#0D7A8C;--ucs:#0B6979;--uh:rgba(13,122,140,.10)}
+body[data-unit="1"]{--uc:#2F6BFF;--ucs:#1E4FD6;--uh:rgba(47,107,255,.08)}
+body[data-unit="2"]{--uc:#9333EA;--ucs:#7C2BC4;--uh:rgba(147,51,234,.10)}
+@media(max-width:1100px){
+  .left,.right{display:none}
+  .mq{display:none}
+  .eqb{bottom:70px}
+  .keys{display:none}
+}
+@media(max-width:760px){
+  .brand h1{font-size:14px}.brand p{display:none}
+  .disclaimer{display:none}
+}
+</style>
+</head>
+<body data-unit="0">
+<canvas id="gl"></canvas>
+<div id="labels"></div>
+
+<header id="top" class="panel">
+  <div class="toprow">
+    <div class="brand">
+      <span class="mark">G1</span>
+      <div><h1>基因的表达</h1><p>DNA → mRNA → 蛋白质</p></div>
+    </div>
+    <div class="mq"><span class="chip violet">主线问题</span><span>DNA 在细胞核里，蛋白质在细胞质里，基因的指令怎样传过去？</span></div>
+    <span class="sp"></span>
+    <span class="status"><i></i>运行中</span>
+    <span class="score">得分 <b id="score">0</b></span>
+    <button class="btn" id="quizBtn">检测 <kbd>Q</kbd></button>
+    <button class="btn" id="helpBtn">玩法</button>
+    <button class="btn" id="fullBtn">全屏 <kbd>F</kbd></button>
+    <button class="btn on" id="voiceBtn">语音 <kbd>V</kbd></button>
+  </div>
+  <div class="chain" id="chain">
+    <div class="item on"><span class="dot"></span><b>DNA</b><small>模板</small></div><span class="arrow">→</span>
+    <div class="item"><span class="dot"></span><b>mRNA</b><small>信使</small></div><span class="arrow">→</span>
+    <div class="item"><span class="dot"></span><b>核糖体</b><small>装配机</small></div><span class="arrow">→</span>
+    <div class="item"><span class="dot"></span><b>肽链</b><small>氨基酸序列</small></div><span class="arrow">→</span>
+    <div class="item"><span class="dot"></span><b>蛋白质</b><small>折叠成形</small></div>
+  </div>
+</header>
+
+<nav class="steps panel" id="steps"></nav>
+
+<aside class="left panel">
+  <div class="phead"><span class="kicker">本步</span><span class="crumb">问句 → 动手 → 结论 + 要点 + 考点</span></div>
+  <div class="stepq"><span class="num" id="stepNo">1</span><h2 id="qTitle">加载中…</h2></div>
+  <p class="scene" id="scene"></p>
+  <div class="try"><span class="kicker">动手试一试</span><span class="chip" id="tryState">还没做</span></div>
+  <p class="instruction" id="instruction"></p>
+  <div class="expect"><b>应该看到：</b><span id="expect"></span></div>
+  <div class="conclusion" id="conclusion" hidden></div>
+  <div class="hintline" id="conclusionHint">点「揭示结论」查看本步结论</div>
+  <div class="mini"><b>本步要点</b><ul id="points"></ul></div>
+  <div class="mini warnbox"><b>易错点</b><span id="warnText"></span></div>
+  <div class="mini exam"><b>考点</b><span id="examText"></span></div>
+  <div class="actions">
+    <button class="btn pri" id="reveal">揭示结论</button>
+    <button class="btn" id="resetStep">复位本步</button>
+  </div>
+  <div class="units" id="units"></div>
+</aside>
+
+<aside class="right panel">
+  <div class="phead"><span class="kicker">中控台</span><span class="crumb">拖一个滑块，看全局的代价</span></div>
+  <div class="readouts">
+    <div class="readout"><b id="roProgress">0</b><span>转录进度 %</span></div>
+    <div class="readout"><b id="roMrna">0</b><span>mRNA 长度 nt</span></div>
+    <div class="readout"><b id="roPeptide">0</b><span>肽链长度 aa</span></div>
+  </div>
+  <div class="sl">
+    <div class="top"><span>演示速度</span><b id="spdVal">1.0×</b></div>
+    <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
+    <div class="scale"><span>0.5×</span><span>1×</span><span>2×</span></div>
+  </div>
+  <div class="toggles">
+    <label class="tg"><input type="checkbox" id="tBases" checked>碱基标记</label>
+    <label class="tg"><input type="checkbox" id="tTrna" checked>tRNA</label>
+    <label class="tg"><input type="checkbox" id="tRibo" checked>核糖体</label>
+  </div>
+  <div class="chartbox">
+    <div class="chart-head"><b>肽链长度 — 步骤</b><span id="chartVal">0 aa</span></div>
+    <canvas id="chart"></canvas>
+  </div>
+  <div class="presets">
+    <button class="btn" id="preset">参考工况</button>
+    <button class="btn danger" id="stop">复位本步</button>
+  </div>
+  <div class="legend">
+    <span><i style="background:#2F6BFF"></i>DNA</span>
+    <span><i style="background:#13B8C6"></i>mRNA</span>
+    <span><i style="background:#F59E0B"></i>核糖体</span>
+    <span><i style="background:#7C5CFF"></i>酶 / tRNA</span>
+  </div>
+</aside>
+
+<div class="eqb" id="eq"><b>本步关系</b><span id="eqText">DNA → mRNA → 蛋白质</span></div>
+
+<footer class="foot panel">
+  <button class="btn" id="prev">‹ 上一步</button>
+  <span class="counter">第 <b id="cur">1</b> / <b id="total">9</b> 步</span>
+  <button class="btn pri" id="next">下一步 ›</button>
+  <button class="btn" id="autoBtn">自动讲课</button>
+  <span class="disclaimer">示意声明：分子大小与时间均为示意；碱基配对为教学简化；转录与翻译已放慢。示意 · 非真实比例。</span>
+  <span class="keys">← → 翻步 · 1–9 跳步 · Q 检测 · F 全屏</span>
+</footer>
+
+<div class="modal" id="quiz" hidden>
+  <div class="quizcard panel">
+    <div class="qhead"><b>考核</b><button class="btn" id="quizClose">×</button></div>
+    <div id="quizBody"></div>
+    <div class="qfoot"><span>得分 <b id="quizScore">0</b> / 3</span><button class="btn pri" id="quizSubmit">提交</button></div>
+  </div>
+</div>
+
+<div class="modal" id="help" hidden>
+  <div class="quizcard panel">
+    <div class="qhead"><b>玩法</b><button class="btn" id="helpClose">×</button></div>
+    <ol class="help-list">
+      <li>点「下一步」按顺序讲课；也可以点顶部步骤条或按 <kbd>1–9</kbd> 跳步。</li>
+      <li>左栏是「本步」脚本：先看问句，再按提示动手，最后点「揭示结论」。</li>
+      <li>右栏「中控台」可以拖演示速度、开关碱基/tRNA/核糖体，观察 3D 与读数的变化。</li>
+      <li>点「检测」做 3 道考核题；得分显示在顶栏。</li>
+      <li>「自动讲课」会在每段旁白读完后自动进入下一步。</li>
+    </ol>
+  </div>
+</div>
+
+<script type="application/json" id="courseware-data">{
+  "meta": {
+    "title": "基因的表达：转录与翻译",
+    "textbook": "人教版 2019",
+    "chapter": "必修2 第4章第1节",
+    "type": "process",
+    "simplifications": [
+      "分子大小与时间均为示意",
+      "碱基配对为教学简化",
+      "转录与翻译已放慢"
+    ]
+  },
+  "stages": [
+    {
+      "id": "scene",
+      "name": "认识现场",
+      "short": "现场",
+      "group": "细胞核",
+      "summary": "细胞核内的 DNA 双螺旋、核孔，以及细胞质中的核糖体。",
+      "narration": "先看全局。DNA 在细胞核里，核糖体在细胞质里，两者并不直接接触。基因的指令要先抄成 mRNA，才能通过核孔带出去。",
+      "events": [
+        "DNA 在细胞核内",
+        "核糖体在细胞质中",
+        "两者通过核孔联系"
+      ],
+      "metrics": [
+        {
+          "key": "progress",
+          "label": "转录进度",
+          "value": 0,
+          "unit": "%"
+        },
+        {
+          "key": "mrna",
+          "label": "mRNA 长度",
+          "value": 0,
+          "unit": "nt"
+        },
+        {
+          "key": "peptide",
+          "label": "肽链长度",
+          "value": 0,
+          "unit": "aa"
+        }
+      ],
+      "scope": "每个细胞",
+      "warning": "DNA 不能直接出核；mRNA 才是信使。",
+      "question": "DNA 在细胞核里，蛋白质在细胞质里，指令怎么过去？",
+      "instruction": "拖动旋转，找到 DNA、核孔和核糖体。",
+      "expect": "DNA 在核内，核糖体在核外；两者不直接接触。",
+      "conclusion": "基因的指令必须先抄成 mRNA，再由 mRNA 带出核。",
+      "source": "必修2 第4章第1节",
+      "visualState": "wide",
+      "unit": 0,
+      "eq": "DNA → mRNA → 蛋白质",
+      "exam": "转录与翻译的场所不同：转录在细胞核，翻译在核糖体。"
+    },
+    {
+      "id": "unwind",
+      "name": "解旋",
+      "short": "解旋",
+      "group": "细胞核",
+      "summary": "RNA 聚合酶结合启动子，DNA 双链在基因所在片段局部解开。",
+      "narration": "转录开始，RNA 聚合酶结合到基因的启动子。DNA 双链只解开一小段，其余的仍保持双螺旋。",
+      "events": [
+        "RNA 聚合酶结合启动子",
+        "局部解旋",
+        "其余 DNA 保持双链"
+      ],
+      "metrics": [
+        {
+          "key": "progress",
+          "label": "转录进度",
+          "value": 5,
+          "unit": "%"
+        },
+        {
+          "key": "mrna",
+          "label": "mRNA 长度",
+          "value": 0,
+          "unit": "nt"
+        },
+        {
+          "key": "peptide",
+          "label": "肽链长度",
+          "value": 0,
+          "unit": "aa"
+        }
+      ],
+      "scope": "每个细胞",
+      "warning": "解旋的是基因所在片段，不是整条染色体。",
+      "question": "为什么只解开基因所在的一小段？",
+      "instruction": "观察 RNA 聚合酶结合的位置，以及双链打开的范围。",
+      "expect": "只有一段双链打开，其余部分仍保持双螺旋。",
+      "conclusion": "转录是局部的，不是整条 DNA 全部解开。",
+      "source": "必修2 第4章第1节",
+      "visualState": "unwind",
+      "unit": 0,
+      "eq": "RNA 聚合酶 + 启动子 → 局部解旋",
+      "exam": "转录起点是启动子；解旋只发生在基因所在片段。"
+    },
+    {
+      "id": "elongation",
+      "name": "转录延伸",
+      "short": "延伸",
+      "group": "细胞核",
+      "summary": "RNA 聚合酶沿模板链移动，mRNA 按碱基互补配对延伸。",
+      "narration": "RNA 聚合酶沿着模板链向前移动，游离的核糖核苷酸按碱基互补配对接到 mRNA 上。模板链的 A 对应 mRNA 的 U，T 对应 A，G 对应 C，C 对应 G。",
+      "events": [
+        "聚合酶沿模板链移动",
+        "A-U、T-A、G-C、C-G 配对",
+        "mRNA 逐渐变长"
+      ],
+      "metrics": [
+        {
+          "key": "progress",
+          "label": "转录进度",
+          "value": 45,
+          "unit": "%"
+        },
+        {
+          "key": "mrna",
+          "label": "mRNA 长度",
+          "value": 30,
+          "unit": "nt"
+        },
+        {
+          "key": "peptide",
+          "label": "肽链长度",
+          "value": 0,
+          "unit": "aa"
+        }
+      ],
+      "scope": "每个细胞",
+      "warning": "转录配对是 A-U、T-A、G-C、C-G；不是 A-T。",
+      "question": "mRNA 的碱基顺序由谁决定？",
+      "instruction": "盯住聚合酶前方的碱基配对，注意 U 代替了 T。",
+      "expect": "模板链 A 对 mRNA U，T 对 A，G 对 C，C 对 G。",
+      "conclusion": "mRNA 的顺序由 DNA 模板链决定，但用 U 代替 T。",
+      "source": "必修2 第4章第1节",
+      "visualState": "transcription",
+      "unit": 0,
+      "eq": "A—U · T—A · G—C · C—G",
+      "exam": "转录的碱基配对：A-U、T-A、G-C、C-G。"
+    },
+    {
+      "id": "release",
+      "name": "转录终止",
+      "short": "终止",
+      "group": "细胞核",
+      "summary": "mRNA 脱离模板，DNA 恢复双链。",
+      "narration": "转录到终止子，mRNA 从模板上脱离，DNA 双链恢复。得到的 mRNA 是单链，长度只覆盖一个基因。",
+      "events": [
+        "mRNA 脱离模板",
+        "DNA 恢复双链",
+        "mRNA 是单链信使"
+      ],
+      "metrics": [
+        {
+          "key": "progress",
+          "label": "转录进度",
+          "value": 100,
+          "unit": "%"
+        },
+        {
+          "key": "mrna",
+          "label": "mRNA 长度",
+          "value": 60,
+          "unit": "nt"
+        },
+        {
+          "key": "peptide",
+          "label": "肽链长度",
+          "value": 0,
+          "unit": "aa"
+        }
+      ],
+      "scope": "每个细胞",
+      "warning": "mRNA 是单链，不是双链。",
+      "question": "mRNA 和 DNA 有什么不同？",
+      "instruction": "比较 mRNA 与 DNA 的链数和碱基组成。",
+      "expect": "mRNA 是单链，含 U 不含 T；DNA 是双链。",
+      "conclusion": "mRNA 是单链信使，长度只覆盖一个基因。",
+      "source": "必修2 第4章第1节",
+      "visualState": "release",
+      "unit": 0,
+      "eq": "mRNA：单链 · 含 U · 不含 T",
+      "exam": "mRNA 是单链，含 U 不含 T。"
+    },
+    {
+      "id": "export",
+      "name": "mRNA 出核",
+      "short": "出核",
+      "group": "细胞质",
+      "summary": "mRNA 通过核孔进入细胞质，核糖体在细胞质中等待。",
+      "narration": "mRNA 通过核孔进入细胞质。核糖体在细胞质里，所以翻译必须等 mRNA 出来以后才能开始。",
+      "events": [
+        "mRNA 穿过核孔",
+        "核糖体在细胞质中",
+        "翻译在核外进行"
+      ],
+      "metrics": [
+        {
+          "key": "progress",
+          "label": "转录进度",
+          "value": 100,
+          "unit": "%"
+        },
+        {
+          "key": "mrna",
+          "label": "mRNA 长度",
+          "value": 60,
+          "unit": "nt"
+        },
+        {
+          "key": "peptide",
+          "label": "肽链长度",
+          "value": 0,
+          "unit": "aa"
+        }
+      ],
+      "scope": "每个细胞",
+      "warning": "核孔是大分子通道，但运输有选择性。",
+      "question": "为什么不能直接在细胞核里翻译？",
+      "instruction": "跟随 mRNA 穿过核孔，找到细胞质中的核糖体。",
+      "expect": "mRNA 出核后与核糖体结合。",
+      "conclusion": "核糖体在细胞质，mRNA 必须出核才能翻译。",
+      "source": "必修2 第4章第1节",
+      "visualState": "export",
+      "unit": 1,
+      "eq": "mRNA → 核孔 → 细胞质",
+      "exam": "mRNA 通过核孔出核；翻译在细胞质中的核糖体上进行。"
+    },
+    {
+      "id": "init",
+      "name": "翻译起始",
+      "short": "起始",
+      "group": "细胞质",
+      "summary": "核糖体结合 mRNA，起始 tRNA 带来甲硫氨酸。",
+      "narration": "核糖体结合到 mRNA 的起始密码子 AUG 上。起始 tRNA 的反密码子 UAC 与 AUG 配对，带来第一个氨基酸——甲硫氨酸。",
+      "events": [
+        "核糖体结合 mRNA",
+        "起始密码子 AUG",
+        "起始 tRNA 带来甲硫氨酸"
+      ],
+      "metrics": [
+        {
+          "key": "progress",
+          "label": "转录进度",
+          "value": 100,
+          "unit": "%"
+        },
+        {
+          "key": "mrna",
+          "label": "mRNA 长度",
+          "value": 60,
+          "unit": "nt"
+        },
+        {
+          "key": "peptide",
+          "label": "肽链长度",
+          "value": 3,
+          "unit": "aa"
+        }
+      ],
+      "scope": "每个细胞",
+      "warning": "起始密码子 AUG 也编码甲硫氨酸。",
+      "question": "核糖体怎么知道从哪里开始翻译？",
+      "instruction": "找到起始密码子 AUG 和起始 tRNA。",
+      "expect": "起始 tRNA 的反密码子 UAC 与 AUG 配对。",
+      "conclusion": "翻译从起始密码子 AUG 开始，读码框由此确定。",
+      "source": "必修2 第4章第1节",
+      "visualState": "init",
+      "unit": 1,
+      "eq": "AUG（起始）· tRNA 反密码子 UAC",
+      "exam": "起始密码子 AUG；起始 tRNA 的反密码子 UAC。"
+    },
+    {
+      "id": "elongation2",
+      "name": "翻译延伸",
+      "short": "延伸",
+      "group": "细胞质",
+      "summary": "tRNA 搬运氨基酸，核糖体沿 mRNA 移动，肽键形成。",
+      "narration": "核糖体沿着 mRNA 向前移动，每读到一个密码子，就有一个 tRNA 带着对应的氨基酸进来。氨基酸之间形成肽键，肽链越来越长。",
+      "events": [
+        "tRNA 搬运氨基酸",
+        "密码子与反密码子配对",
+        "肽键形成，肽链变长"
+      ],
+      "metrics": [
+        {
+          "key": "progress",
+          "label": "转录进度",
+          "value": 100,
+          "unit": "%"
+        },
+        {
+          "key": "mrna",
+          "label": "mRNA 长度",
+          "value": 60,
+          "unit": "nt"
+        },
+        {
+          "key": "peptide",
+          "label": "肽链长度",
+          "value": 9,
+          "unit": "aa"
+        }
+      ],
+      "scope": "每个细胞",
+      "warning": "tRNA 上的反密码子与 mRNA 密码子互补，不是相同。",
+      "question": "氨基酸的顺序由谁决定？",
+      "instruction": "观察 tRNA 进入、配对、退出，以及肽链的延长。",
+      "expect": "每三个碱基决定一个氨基酸；肽链逐渐变长。",
+      "conclusion": "mRNA 上的密码子顺序决定氨基酸顺序。",
+      "source": "必修2 第4章第1节",
+      "visualState": "elongation",
+      "unit": 1,
+      "eq": "1 个密码子（3 个碱基）→ 1 个氨基酸",
+      "exam": "密码子决定氨基酸；tRNA 搬运氨基酸。"
+    },
+    {
+      "id": "stop",
+      "name": "翻译终止",
+      "short": "终止",
+      "group": "细胞质",
+      "summary": "终止密码子出现，肽链释放并折叠。",
+      "narration": "核糖体读到终止密码子，肽链从核糖体上释放，随后折叠成有三维结构的蛋白质。一条肽链还不等于有功能的蛋白质。",
+      "events": [
+        "终止密码子不编码氨基酸",
+        "肽链释放",
+        "折叠/加工后才有功能"
+      ],
+      "metrics": [
+        {
+          "key": "progress",
+          "label": "转录进度",
+          "value": 100,
+          "unit": "%"
+        },
+        {
+          "key": "mrna",
+          "label": "mRNA 长度",
+          "value": 60,
+          "unit": "nt"
+        },
+        {
+          "key": "peptide",
+          "label": "肽链长度",
+          "value": 12,
+          "unit": "aa"
+        }
+      ],
+      "scope": "每个细胞",
+      "warning": "终止密码子不编码氨基酸，但终止过程需要释放因子。",
+      "question": "一条肽链就是有功能的蛋白质吗？",
+      "instruction": "找到终止密码子，观察肽链释放与折叠。",
+      "expect": "终止密码子不编码氨基酸；肽链折叠成三维结构。",
+      "conclusion": "肽链需折叠/加工才有功能；基因表达还包括加工与运输。",
+      "source": "必修2 第4章第1节",
+      "visualState": "stop",
+      "unit": 1,
+      "eq": "终止密码子 → 肽链释放 → 折叠",
+      "exam": "终止密码子不编码氨基酸；肽链需折叠/加工才有功能。"
+    },
+    {
+      "id": "quiz",
+      "name": "考核",
+      "short": "考核",
+      "group": "综合",
+      "summary": "回到全景，完成 3 道选择题。",
+      "narration": "最后回到全景。用三道题检查一下：转录和翻译的场所、模板、产物分别是什么。",
+      "events": [
+        "转录：核内，DNA 模板，产物 mRNA",
+        "翻译：核糖体，mRNA 模板，产物肽链",
+        "两者合称基因的表达"
+      ],
+      "metrics": [
+        {
+          "key": "progress",
+          "label": "转录进度",
+          "value": 100,
+          "unit": "%"
+        },
+        {
+          "key": "mrna",
+          "label": "mRNA 长度",
+          "value": 60,
+          "unit": "nt"
+        },
+        {
+          "key": "peptide",
+          "label": "肽链长度",
+          "value": 12,
+          "unit": "aa"
+        }
+      ],
+      "scope": "每个细胞",
+      "warning": "不要把转录和翻译的场所、模板、产物混淆。",
+      "question": "三题检测：转录与翻译的关键区别。",
+      "instruction": "点击右上角「检测」开始作答。",
+      "expect": "答完显示得分与解析。",
+      "conclusion": "转录在核内、以 DNA 为模板、产物 mRNA；翻译在核糖体、以 mRNA 为模板、产物肽链。",
+      "source": "必修2 第4章第1节",
+      "visualState": "quiz",
+      "unit": 2,
+      "eq": "转录（核内）→ 翻译（核糖体）",
+      "exam": "转录：核内、DNA 模板、产物 mRNA；翻译：核糖体、mRNA 模板、产物肽链。"
+    }
+  ]
+}</script>
+
+<script src="libs/three.min.js"></script>
+<script>if(!window.THREE){document.write('<script src="https://unpkg.com/three@0.128.0/build/three.min.js"><\/script>');}</script>
+<script>
+/* ================= 数据 ================= */
+const $ = id => document.getElementById(id);
+const DATA = JSON.parse(document.getElementById('courseware-data').textContent);
+const STAGES = DATA.stages;
+const N = STAGES.length;
+const QUIZ = [
+  {q:'转录的模板和产物分别是？', opts:['DNA 双链 / mRNA','DNA 的一条链 / mRNA','mRNA / 肽链','肽链 / 蛋白质'], a:1,
+   why:'转录以 DNA 的一条链为模板，产物是 mRNA。'},
+  {q:'翻译过程中，氨基酸的顺序由什么决定？', opts:['tRNA 的种类','核糖体的大小','mRNA 上的密码子顺序','蛋白质的折叠方式'], a:2,
+   why:'mRNA 上每三个相邻碱基是一个密码子，决定一个氨基酸。'},
+  {q:'下列关于转录和翻译的叙述，正确的是？', opts:['转录在细胞质，翻译在细胞核','转录和翻译都以 DNA 为模板','转录产生 mRNA，翻译产生肽链','转录和翻译都不需要酶'], a:2,
+   why:'转录产物是 mRNA，翻译产物是肽链；转录在核内，翻译在核糖体。'}
+];
+const PEPTIDE = STAGES.map(s => s.metrics[2].value);
+
+/* ================= 三维场景 ================= */
+const canvas = $('gl');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+renderer.outputEncoding = THREE.sRGBEncoding;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(42, 1, .1, 100);
+scene.add(new THREE.HemisphereLight(0xffffff, 0xdfe8ff, 1.0));
+const dl1 = new THREE.DirectionalLight(0xffffff, .85); dl1.position.set(5,8,6); scene.add(dl1);
+const dl2 = new THREE.DirectionalLight(0xa5b4fc, .35); dl2.position.set(-6,-3,-4); scene.add(dl2);
+
+function bond(a, b, r, color){
+  const dir = new THREE.Vector3().subVectors(b, a);
+  const len = dir.length();
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 8),
+    new THREE.MeshStandardMaterial({color, roughness:.4}));
+  m.position.copy(a).add(b).multiplyScalar(.5);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir.normalize());
+  return m;
+}
+
+/* 细胞核 */
+const nucleus = new THREE.Mesh(new THREE.SphereGeometry(2.15, 48, 32),
+  new THREE.MeshPhysicalMaterial({color:0x9ec5ff, transparent:true, opacity:.13, roughness:.2, metalness:0, side:THREE.DoubleSide}));
+nucleus.position.set(-4.3, .3, 0); scene.add(nucleus);
+const nucWire = new THREE.Mesh(new THREE.SphereGeometry(2.16, 24, 16),
+  new THREE.MeshBasicMaterial({color:0x2F6BFF, wireframe:true, transparent:true, opacity:.06}));
+nucWire.position.copy(nucleus.position); scene.add(nucWire);
+
+/* 核孔 */
+const pore = new THREE.Mesh(new THREE.TorusGeometry(.34, .07, 12, 28),
+  new THREE.MeshStandardMaterial({color:0x7C5CFF, roughness:.3}));
+pore.position.set(-2.0, .3, .85); pore.rotation.y = Math.PI/2; scene.add(pore);
+
+/* DNA 双螺旋 */
+const dnaGroup = new THREE.Group(); scene.add(dnaGroup);
+const ptsA = [], ptsB = [];
+for(let i=0;i<=90;i++){
+  const x = -5.6 + i*0.029, a = i*0.55;
+  ptsA.push(new THREE.Vector3(x, .3 + .32*Math.sin(a), .32*Math.cos(a)));
+  ptsB.push(new THREE.Vector3(x, .3 + .32*Math.sin(a+Math.PI), .32*Math.cos(a+Math.PI)));
+}
+dnaGroup.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ptsA), 140, .04, 8, false),
+  new THREE.MeshStandardMaterial({color:0x2F6BFF, roughness:.35})));
+dnaGroup.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ptsB), 140, .04, 8, false),
+  new THREE.MeshStandardMaterial({color:0x13B8C6, roughness:.35})));
+const dnaBases = new THREE.Group(); dnaGroup.add(dnaBases);
+const baseColors = [0xEF4444, 0x3B82F6, 0x10B981, 0xF59E0B];
+for(let i=6;i<ptsA.length-6;i+=5){
+  dnaBases.add(bond(ptsA[i], ptsB[i], .022, baseColors[Math.floor(i/5)%4]));
+}
+
+/* RNA 聚合酶 */
+const pol = new THREE.Group();
+const polBody = new THREE.Mesh(new THREE.TorusGeometry(.38, .11, 12, 26),
+  new THREE.MeshStandardMaterial({color:0x7C5CFF, roughness:.3}));
+polBody.rotation.y = Math.PI/2; pol.add(polBody);
+pol.add(new THREE.Mesh(new THREE.SphereGeometry(.16, 16, 12),
+  new THREE.MeshStandardMaterial({color:0x9333EA, roughness:.3})));
+pol.position.set(-5.4, .3, 0); scene.add(pol);
+
+/* mRNA 曲线 */
+const mrnaCurve = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(-3.9,.3,0), new THREE.Vector3(-2.8,.5,.3),
+  new THREE.Vector3(-2.0,.3,.85), new THREE.Vector3(-.5,.1,.5),
+  new THREE.Vector3(1.6,-.1,0)
+]);
+const mrnaPtsAll = mrnaCurve.getPoints(120);
+const mrnaGeo = new THREE.BufferGeometry().setFromPoints(mrnaPtsAll);
+const mrnaLine = new THREE.Line(mrnaGeo, new THREE.LineBasicMaterial({color:0x13B8C6, transparent:true, opacity:.95}));
+scene.add(mrnaLine);
+const mrnaTube = new THREE.Mesh(new THREE.TubeGeometry(mrnaCurve, 120, .022, 6, false),
+  new THREE.MeshStandardMaterial({color:0x13B8C6, transparent:true, opacity:.85, roughness:.4}));
+scene.add(mrnaTube);
+const mrnaBases = new THREE.Group(); scene.add(mrnaBases);
+for(let i=4;i<mrnaPtsAll.length-4;i+=5){
+  const s = new THREE.Mesh(new THREE.SphereGeometry(.035, 8, 6),
+    new THREE.MeshStandardMaterial({color:0x13B8C6}));
+  s.position.copy(mrnaPtsAll[i]); s.visible = false; mrnaBases.add(s);
+}
+
+/* 核糖体 */
+const ribo = new THREE.Group(); ribo.position.set(1.6, -.1, 0);
+const r1 = new THREE.Mesh(new THREE.SphereGeometry(.5, 24, 18),
+  new THREE.MeshStandardMaterial({color:0xF59E0B, roughness:.4}));
+r1.position.y = .18; r1.scale.set(1,.8,1);
+const r2 = new THREE.Mesh(new THREE.SphereGeometry(.34, 20, 14),
+  new THREE.MeshStandardMaterial({color:0xD97706, roughness:.4}));
+r2.position.y = -.28; r2.scale.set(1.1,.7,1);
+ribo.add(r1, r2);
+const cleft = new THREE.Mesh(new THREE.TorusGeometry(.34, .05, 8, 20),
+  new THREE.MeshStandardMaterial({color:0x7C5CFF, roughness:.4}));
+cleft.rotation.x = Math.PI/2; cleft.position.y = -.02; ribo.add(cleft);
+scene.add(ribo);
+
+/* tRNA */
+const trnas = [];
+for(let i=0;i<3;i++){
+  const g = new THREE.Group();
+  const c1 = new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.5,8),
+    new THREE.MeshStandardMaterial({color:0x7C5CFF}));
+  c1.position.y = .25;
+  const c2 = new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.3,8),
+    new THREE.MeshStandardMaterial({color:0x7C5CFF}));
+  c2.rotation.z = Math.PI/2; c2.position.set(.15,.5,0);
+  const aa = new THREE.Mesh(new THREE.SphereGeometry(.11, 12, 8),
+    new THREE.MeshStandardMaterial({color:[0xEF4444,0x10B981,0xF59E0B][i]}));
+  aa.position.set(.3,.5,0);
+  g.add(c1,c2,aa); g.position.set(1.0+i*.18,-.1,.6); g.visible = false;
+  scene.add(g); trnas.push(g);
+}
+
+/* 肽链 */
+const peptideGroup = new THREE.Group(); scene.add(peptideGroup);
+for(let i=0;i<12;i++){
+  const s = new THREE.Mesh(new THREE.SphereGeometry(.09, 10, 8),
+    new THREE.MeshStandardMaterial({color:[0xEF4444,0x10B981,0xF59E0B,0x2F6BFF][i%4]}));
+  s.position.set(2.2+i*.12, .2+Math.sin(i*.6)*.12, 0);
+  s.visible = false; peptideGroup.add(s);
+}
+
+/* 细胞质颗粒 */
+const dust = new THREE.Group();
+for(let i=0;i<70;i++){
+  const s = new THREE.Mesh(new THREE.SphereGeometry(.02, 6, 4),
+    new THREE.MeshBasicMaterial({color:0x2F6BFF, transparent:true, opacity:.18}));
+  s.position.set(Math.random()*6-1, Math.random()*3-1.5, Math.random()*3-1.5);
+  dust.add(s);
+}
+scene.add(dust);
+
+/* ================= 相机 ================= */
+const CAM = [
+  {p:[0.4,2.8,12.5], t:[-1.6,0.2,0]},
+  {p:[-4.3,2.2,7.8], t:[-4.3,0.3,0]},
+  {p:[-4.1,1.8,7.2], t:[-4.1,0.3,0]},
+  {p:[-3.5,1.8,7.4], t:[-3.5,0.3,0]},
+  {p:[-2.2,1.8,7.6], t:[-2.1,0.3,0.4]},
+  {p:[1.4,1.8,7.6], t:[1.8,-0.1,0]},
+  {p:[1.7,1.6,7.2], t:[2.0,-0.1,0]},
+  {p:[1.2,2.2,8.6], t:[1.6,0.0,0]},
+  {p:[0.4,2.8,12.5], t:[-1.0,0.2,0]}
+];
+const camPos = new THREE.Vector3(...CAM[0].p);
+const camTgt = new THREE.Vector3(...CAM[0].t);
+camera.position.copy(camPos); camera.lookAt(camTgt);
+
+/* ================= 状态与渲染 ================= */
+let t = 0, targetT = 0, curStep = 0, auto = false, voiceOn = true, speed = 1;
+let basesOn = true, trnaOn = true, riboOn = true;
+const lerp = (a,b,k) => a + (b-a)*k;
+
+function apply(tt, now){
+  const i0 = Math.max(0, Math.min(N-1, Math.floor(tt)));
+  const i1 = Math.max(0, Math.min(N-1, Math.ceil(tt)));
+  const k = tt - i0;
+  const m0 = STAGES[i0].metrics, m1 = STAGES[i1].metrics;
+  const prog = lerp(m0[0].value, m1[0].value, k);
+  const mrna = lerp(m0[1].value, m1[1].value, k);
+  const pep = lerp(m0[2].value, m1[2].value, k);
+
+  const polX = lerp(-5.4, -3.2, prog/100);
+  pol.position.set(polX, .3, 0);
+  pol.rotation.x = Math.sin(now*.001)*.12;
+
+  mrnaGeo.setDrawRange(0, Math.max(0, Math.floor(mrnaPtsAll.length * mrna/60)));
+  const idxCount = mrnaTube.geometry.index ? mrnaTube.geometry.index.count : 0;
+  mrnaTube.geometry.setDrawRange(0, Math.floor(idxCount * mrna/60));
+  mrnaBases.children.forEach((s,i)=>{ s.visible = i < Math.floor(mrnaBases.children.length * mrna/60); });
+  peptideGroup.children.forEach((s,i)=>{ s.visible = i < Math.round(pep/1.5); });
+  trnas.forEach((g,i)=>{
+    g.visible = trnaOn && tt > 4.9 && tt < 8.2;
+    g.position.y = -.1 + Math.sin(now*.002 + i*1.7)*.06;
+    g.position.x = 1.0 + i*.18;
+  });
+  ribo.visible = riboOn;
+  dnaBases.visible = basesOn;
+  dnaGroup.rotation.y = Math.sin(now*.0002)*.12;
+
+  const p0 = CAM[i0].p, p1 = CAM[i1].p;
+  const gp = new THREE.Vector3(lerp(p0[0],p1[0],k), lerp(p0[1],p1[1],k), lerp(p0[2],p1[2],k));
+  const g0 = CAM[i0].t, g1 = CAM[i1].t;
+  const gt = new THREE.Vector3(lerp(g0[0],g1[0],k), lerp(g0[1],g1[1],k), lerp(g0[2],g1[2],k));
+  camPos.lerp(gp, .08); camTgt.lerp(gt, .08);
+  camera.position.copy(camPos); camera.lookAt(camTgt);
+}
+
+/* ================= 标签 ================= */
+const labelBox = $('labels');
+const LABELS = [
+  {text:'细胞核', pos:()=>new THREE.Vector3(-4.3,2.6,0), show:()=>true},
+  {text:'DNA', pos:()=>new THREE.Vector3(-4.3,1.0,.4), show:()=>true},
+  {text:'RNA 聚合酶', pos:()=>pol.position.clone().add(new THREE.Vector3(0,.6,0)), show:tt=>tt>=0.9&&tt<4.2},
+  {text:'核孔', pos:()=>new THREE.Vector3(-2.0,.9,.9), show:()=>true},
+  {text:'mRNA', pos:()=>new THREE.Vector3(-.6,.6,.5), show:tt=>tt>=2.2},
+  {text:'核糖体', pos:()=>new THREE.Vector3(1.6,.75,0), show:tt=>tt>=4.5},
+  {text:'tRNA', pos:()=>new THREE.Vector3(1.0,.9,.6), show:tt=>tt>=4.9&&tt<8.2},
+  {text:'肽链', pos:()=>new THREE.Vector3(2.9,.8,0), show:tt=>tt>=6.2}
+].map(L=>{
+  const el = document.createElement('div'); el.className = 'tag'; el.textContent = L.text;
+  labelBox.appendChild(el); return {...L, el};
+});
+const _v = new THREE.Vector3();
+function updateLabels(){
+  LABELS.forEach(L=>{
+    if(!L.show(t)){ L.el.style.display='none'; return; }
+    _v.copy(L.pos()); _v.project(camera);
+    if(_v.z > 1){ L.el.style.display='none'; return; }
+    L.el.style.display='block';
+    L.el.style.left = ((_v.x*.5+.5)*innerWidth)+'px';
+    L.el.style.top = ((-_v.y*.5+.5)*innerHeight)+'px';
+  });
+}
+
+/* ================= 图表 ================= */
+const chart = $('chart');
+function drawChart(i){
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  const w = chart.clientWidth || 240, h = 78;
+  chart.width = w*dpr; chart.height = h*dpr;
+  const c = chart.getContext('2d');
+  c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h);
+  const pad = 6, max = 12;
+  const x = j => pad + (w-2*pad)*j/(N-1);
+  const y = v => h-pad - (h-2*pad)*v/max;
+  c.strokeStyle = 'rgba(14,26,43,.08)'; c.lineWidth = 1;
+  [0,4,8,12].forEach(v=>{ c.beginPath(); c.moveTo(pad,y(v)); c.lineTo(w-pad,y(v)); c.stroke(); });
+  c.beginPath(); c.strokeStyle = '#2F6BFF'; c.lineWidth = 2;
+  PEPTIDE.forEach((v,j)=>{ j ? c.lineTo(x(j),y(v)) : c.moveTo(x(j),y(v)); });
+  c.stroke();
+  const v = PEPTIDE[i];
+  c.beginPath(); c.fillStyle = '#7C5CFF'; c.arc(x(i),y(v),3.5,0,7); c.fill();
+}
+
+/* ================= 语音（五态） ================= */
+const synth = window.speechSynthesis;
+let voiceReady = false, voiceState = 'ended', voiceToken = 0, voiceStage = -1, fallbackTimer = 0;
+let zhVoice = null;
+function loadVoices(){
+  if(!synth) return;
+  const vs = synth.getVoices();
+  zhVoice = vs.find(v=>/zh[-_]?CN|Chinese|中文|普通话/i.test(v.lang+' '+v.name)) || vs.find(v=>/^zh/i.test(v.lang)) || null;
+}
+if(synth){ loadVoices(); synth.onvoiceschanged = loadVoices; }
+function cancelVoice(){
+  voiceToken++; voiceStage = -1; clearTimeout(fallbackTimer);
+  if(synth) synth.cancel();
+  voiceState = 'cancelled';
+}
+function speakStage(i){
+  if(!synth || i<0){ voiceState = 'ended'; return; }
+  const my = ++voiceToken;
+  voiceStage = i; voiceState = 'pending';
+  synth.cancel(); clearTimeout(fallbackTimer);
+  const u = new SpeechSynthesisUtterance(STAGES[i].narration);
+  u.lang = 'zh-CN'; u.rate = 1; u.pitch = 1;
+  if(zhVoice) u.voice = zhVoice;
+  u.onstart = ()=>{ if(my!==voiceToken) return; voiceState = 'speaking'; };
+  u.onend = ()=>{ if(my!==voiceToken) return; voiceState = 'ended'; };
+  u.onerror = ()=>{ if(my!==voiceToken) return; voiceState = 'error'; setTimeout(()=>{ if(my===voiceToken) voiceState = 'ended'; }, 800); };
+  synth.speak(u);
+  fallbackTimer = setTimeout(()=>{
+    if(my!==voiceToken) return;
+    if(voiceState==='pending'||voiceState==='speaking') voiceState = 'ended';
+  }, 30000);
+}
+document.addEventListener('pointerdown', ()=>{ voiceReady = true; }, { once:true });
+
+/* ================= UI ================= */
+function setStepUI(i){
+  const s = STAGES[i];
+  $('stepNo').textContent = i+1;
+  $('qTitle').textContent = s.question;
+  $('scene').textContent = s.summary;
+  $('instruction').textContent = s.instruction;
+  $('expect').textContent = s.expect;
+  $('conclusion').textContent = s.conclusion;
+  $('conclusion').hidden = true;
+  $('conclusionHint').hidden = false;
+  $('points').innerHTML = s.events.map(x=>'<li>'+x+'</li>').join('');
+  $('warnText').textContent = s.warning;
+  $('examText').textContent = s.exam || '';
+  $('tryState').textContent = '还没做'; $('tryState').className = 'chip';
+  $('eqText').textContent = s.eq;
+  $('cur').textContent = i+1;
+  document.querySelectorAll('#steps .step').forEach((b,j)=>{
+    b.classList.toggle('on', j===i);
+    b.classList.toggle('done', j<i);
+  });
+  const chainOn = [0,0,1,1,1,2,2,3,4][i];
+  document.querySelectorAll('#chain .item').forEach((b,j)=>b.classList.toggle('on', j===chainOn));
+  document.querySelectorAll('#units .unit').forEach((b,j)=>b.classList.toggle('on', j===s.unit));
+  document.body.dataset.unit = s.unit;
+  $('roProgress').textContent = s.metrics[0].value;
+  $('roMrna').textContent = s.metrics[1].value;
+  $('roPeptide').textContent = s.metrics[2].value;
+  $('chartVal').textContent = s.metrics[2].value + ' aa';
+  drawChart(i);
+}
+function goStep(i){
+  i = Math.max(0, Math.min(N-1, i));
+  cancelVoice();
+  curStep = i; targetT = i;
+  setStepUI(i);
+  if(voiceOn && voiceReady && synth) setTimeout(()=>{ if(targetT===i) speakStage(i); }, 350);
+}
+
+/* 步骤条 */
+STAGES.forEach((s,i)=>{
+  const b = document.createElement('button');
+  b.className = 'step';
+  b.innerHTML = `<span class="n">${i+1}</span><span>${s.short}</span>`;
+  b.onclick = ()=>goStep(i);
+  $('steps').appendChild(b);
+});
+$('total').textContent = N;
+
+/* 单元 */
+const UNITS = [{name:'细胞核', i:0}, {name:'细胞质', i:4}, {name:'分子细节', i:2}];
+UNITS.forEach((u,j)=>{
+  const b = document.createElement('button');
+  b.className = 'unit';
+  b.textContent = `${['①','②','③'][j]} ${u.name}`;
+  b.onclick = ()=>goStep(u.i);
+  $('units').appendChild(b);
+});
+
+/* 按钮 */
+$('next').onclick = ()=>goStep(curStep+1);
+$('prev').onclick = ()=>goStep(curStep-1);
+$('reveal').onclick = ()=>{ $('conclusion').hidden = false; $('conclusionHint').hidden = true; $('tryState').textContent='已完成'; $('tryState').className='chip on'; };
+$('resetStep').onclick = ()=>{ $('conclusion').hidden = true; $('conclusionHint').hidden = false; $('tryState').textContent='还没做'; $('tryState').className='chip'; };
+$('stop').onclick = ()=>goStep(curStep);
+$('preset').onclick = ()=>{ speed=1; $('speed').value=1; $('spdVal').textContent='1.0×'; $('tBases').checked=true; $('tTrna').checked=true; $('tRibo').checked=true; basesOn=trnaOn=riboOn=true; };
+$('speed').oninput = e=>{ speed = +e.target.value; $('spdVal').textContent = speed.toFixed(1)+'×'; };
+$('tBases').onchange = e=>{ basesOn = e.target.checked; };
+$('tTrna').onchange = e=>{ trnaOn = e.target.checked; };
+$('tRibo').onchange = e=>{ riboOn = e.target.checked; };
+$('voiceBtn').onclick = e=>{
+  voiceOn = !voiceOn;
+  e.currentTarget.classList.toggle('on', voiceOn);
+  e.currentTarget.textContent = voiceOn ? '语音 V' : '语音关';
+  if(!voiceOn) cancelVoice(); else if(voiceReady) speakStage(curStep);
+};
+$('autoBtn').onclick = e=>{
+  auto = !auto;
+  e.currentTarget.classList.toggle('on', auto);
+  e.currentTarget.textContent = auto ? '自动讲课中' : '自动讲课';
+};
+$('fullBtn').onclick = ()=> document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+
+/* 考核 */
+function openQuiz(){
+  const body = $('quizBody'); body.innerHTML = '';
+  QUIZ.forEach((q,i)=>{
+    const d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = `<b>${i+1}. ${q.q}</b>` + q.opts.map((o,j)=>
+      `<label class="opt"><input type="radio" name="q${i}" value="${j}"> ${o}</label>`).join('') +
+      `<div class="why" id="why${i}" hidden></div>`;
+    body.appendChild(d);
+  });
+  $('quizScore').textContent = '0';
+  $('quiz').hidden = false;
+}
+function closeQuiz(){ $('quiz').hidden = true; }
+$('quizBtn').onclick = openQuiz;
+$('quizClose').onclick = closeQuiz;
+$('quizSubmit').onclick = ()=>{
+  let score = 0;
+  QUIZ.forEach((q,i)=>{
+    const sel = document.querySelector(`input[name=q${i}]:checked`);
+    const why = $('why'+i); why.hidden = false;
+    const ok = sel && +sel.value === q.a;
+    if(ok) score++;
+    why.className = 'why ' + (ok ? 'ok' : 'bad');
+    why.textContent = (ok ? '✓ 正确。' : '✗ 正确答案：' + 'ABCD'[q.a] + '。') + q.why;
+  });
+  $('quizScore').textContent = score;
+  $('score').textContent = score;
+};
+$('helpBtn').onclick = ()=>{ $('help').hidden = false; };
+$('helpClose').onclick = ()=>{ $('help').hidden = true; };
+
+/* 键盘 */
+addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight') goStep(curStep+1);
+  else if(e.key==='ArrowLeft') goStep(curStep-1);
+  else if(/^[1-9]$/.test(e.key)) goStep(+e.key-1);
+  else if(e.key.toLowerCase()==='q') openQuiz();
+  else if(e.key.toLowerCase()==='f') $('fullBtn').click();
+  else if(e.key.toLowerCase()==='v') $('voiceBtn').click();
+  else if(e.key==='Escape'){ closeQuiz(); $('help').hidden = true; }
+});
+
+/* 尺寸 */
+function resize(){
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w/h; camera.updateProjectionMatrix();
+  drawChart(curStep);
+}
+addEventListener('resize', resize);
+
+/* 主循环 */
+let last = performance.now(), autoTimer = 0;
+function loop(now){
+  const dt = Math.min(.05, (now-last)/1000); last = now;
+  const k = Math.min(1, dt * 6 * speed);
+  t += (targetT - t) * k;
+  if(Math.abs(targetT - t) < .001) t = targetT;
+  apply(t, now);
+  updateLabels();
+  renderer.render(scene, camera);
+  if(auto && Math.abs(t-targetT) < .01 && targetT < N-1 && !autoTimer){
+    const ok = voiceOn ? (voiceState==='ended') : true;
+    if(ok){
+      const delay = voiceOn ? 700 : 2200;
+      autoTimer = setTimeout(()=>{ autoTimer = 0; if(auto && targetT < N-1) goStep(targetT+1); }, delay);
+    }
+  }
+  requestAnimationFrame(loop);
+}
+
+/* 初始化 */
+const q = new URLSearchParams(location.search);
+let start = Math.min(N-1, Math.max(0, parseFloat(q.get('t')) || 0));
+if(q.get('voice') === '0'){ voiceOn = false; $('voiceBtn').classList.remove('on'); $('voiceBtn').textContent = '语音关'; }
+if(q.get('simple') === '1'){ document.body.classList.add('simple'); }
+resize();
+t = targetT = Math.round(start);
+goStep(Math.round(start));
+apply(t, performance.now());
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

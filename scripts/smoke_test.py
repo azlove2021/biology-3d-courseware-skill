@@ -62,12 +62,13 @@ def main():
             else:
                 notes.append(f"canvas {box['width']:.0f}x{box['height']:.0f}")
 
-        name_before = page.text_content("#sName") if page.query_selector("#sName") else None
+        title_sel = "#sName" if page.query_selector("#sName") else "#qTitle"
+        name_before = page.text_content(title_sel) if page.query_selector(title_sel) else None
         nxt = page.query_selector("#next")
         if nxt:
             nxt.click()
             page.wait_for_timeout(500)
-            name_after = page.text_content("#sName") if page.query_selector("#sName") else None
+            name_after = page.text_content(title_sel) if page.query_selector(title_sel) else None
             if name_before and name_after and name_before == name_after:
                 errors.append("点击下一阶段后 #sName 未变化")
             else:

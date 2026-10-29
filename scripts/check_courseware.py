@@ -29,19 +29,25 @@ except Exception:
 
 DEFAULTS = {
     "type": "process",
+    "layout": "cockpit",
+    "theme": "glass",
     "voiceMode": "required",
     "quantityChart": "required",
     "interactionLevel": "standard",
     "offlineRequired": True,
+    "bundle": "inline",
     "params": ["t", "voice", "simple"],
     "publishMode": "local",
     "knowledgeBase": "",
 }
 ALLOWED = {
     "type": {"process", "anatomy", "experiment", "comparison"},
+    "layout": {"cockpit", "legacy"},
+    "theme": {"glass", "bright"},
     "voiceMode": {"required", "optional", "disabled"},
     "quantityChart": {"required", "optional", "disabled"},
     "interactionLevel": {"basic", "standard", "advanced"},
+    "bundle": {"inline", "libs"},
     "publishMode": {"local", "ask", "auto"},
 }
 
@@ -144,6 +150,7 @@ def normalize_stage(stage: dict, index: int):
         "narration": stage.get("narration") or stage.get("v") or "",
         "events": stage.get("events") or stage.get("f") or [],
         "counts": c,
+        "metrics": stage.get("metrics") if isinstance(stage.get("metrics"), list) else [],
         "cells": as_int(stage.get("cells")),
         "scope": stage.get("scope") or "",
         "warning": stage.get("warning") or stage.get("w") or "",
@@ -271,17 +278,26 @@ def check_static(report: Report, html: str, base: Path, profile: dict, html_path
     if not re.search(r"THREE\.", html):
         report.fail("static", "HTML 未发现 THREE 场景代码，疑似不是 3D 课件")
 
-    # 主题
-    for token in ("--accent", "--accent2", "--ink", "--muted", "--line",
-                  "--red", "--blue", "--purple", "--cyan", "--orange"):
+    # 主题（v1.2 玻璃拟态驾驶舱）
+    for token in ("--sci", "--cyan", "--violet", "--ok", "--warn", "--bad",
+                  "--ink", "--glass", "--glass-blur", "--shadow-2",
+                  "--line", "--tint", "--r-panel"):
         if token not in html:
-            report.warn("static", f"主题变量缺失: {token}")
-    if "radial-gradient" not in html:
-        report.warn("static", "背景未见 radial-gradient 光斑，可能过于单调")
-    if "简洁" not in html:
-        report.warn("static", "未见「简洁模式」")
-    if not re.search(r"@media[^{]*980", html):
-        report.warn("static", "未见 ≤980px 响应式断点")
+            report.warn("static", f"设计 token 缺失: {token}")
+    if profile.get("theme") == "glass" and "backdrop-filter" not in html:
+        report.fail("static", "glass 主题必须使用 backdrop-filter")
+    if "PingFang SC" not in html:
+        report.warn("static", "字体栈缺少 PingFang SC")
+    if not re.search(r"clamp\(", html):
+        report.warn("static", "未见 clamp() 响应式尺寸")
+    if "因果链" not in html and "主线问题" not in html:
+        report.warn("static", "未见驾驶舱的「主线问题 / 因果链」")
+    if "本步" not in html or "中控台" not in html:
+        report.warn("static", "未见左栏「本步」或右栏「中控台」")
+    if not re.search(r"下一步|上一步", html):
+        report.warn("static", "未见「上一步 / 下一步」导航")
+    if "考核" not in html:
+        report.warn("static", "未见「考核」环节（最后一步应固定为考核）")
 
     # 专业性
     if "示意" not in html and "非真实比例" not in html:
@@ -371,6 +387,7 @@ def check_data(report: Report, html: str, base: Path, profile: dict, html_path: 
         report.fail("data", "阶段数少于 2，无法构成过程")
 
     ids = {}
+    metric_keys = None
     for i, s in enumerate(stages):
         tag = f"阶段 {i + 1}"
         if not s["name"]:
@@ -387,16 +404,34 @@ def check_data(report: Report, html: str, base: Path, profile: dict, html_path: 
             report.fail("data", f"阶段 id 重复：{s['id']}")
         ids[s["id"]] = True
 
-        c = s["counts"]
-        if any(x is None or x < 0 for x in c):
-            report.fail("data", f"{tag} counts 必须是 3 个非负整数")
+        has_counts = any(x is not None for x in s["counts"])
+        if has_counts:
+            c = s["counts"]
+            if any(x is None or x < 0 for x in c):
+                report.fail("data", f"{tag} counts 必须是 3 个非负整数")
+            else:
+                chr_, dna, chromatid = c
+                if chromatid not in (0, 2 * chr_):
+                    report.warn("data", f"{tag} 染色单体={chromatid}，通常应为 0 或 2×染色体({2 * chr_})")
+                if dna < chr_:
+                    report.warn("data", f"{tag} DNA={dna} 小于染色体={chr_}，请核对")
+        elif s["metrics"]:
+            keys = []
+            for m in s["metrics"]:
+                if not isinstance(m, dict) or not (m.get("label") or m.get("key")):
+                    report.fail("data", f"{tag} metrics 每项必须含 label/key")
+                    continue
+                if m.get("value") is None or not isinstance(m.get("value"), (int, float)):
+                    report.fail("data", f"{tag} metrics「{m.get('label') or m.get('key')}」value 必须是数字")
+                keys.append(m.get("key") or m.get("label"))
+            if metric_keys is None:
+                metric_keys = keys
+            elif keys != metric_keys:
+                report.fail("data", f"{tag} metrics 的 key 集合与第 1 步不一致")
         else:
-            chr_, dna, chromatid = c
-            if chromatid not in (0, 2 * chr_):
-                report.warn("data", f"{tag} 染色单体={chromatid}，通常应为 0 或 2×染色体({2 * chr_})")
-            if dna < chr_:
-                report.warn("data", f"{tag} DNA={dna} 小于染色体={chr_}，请核对")
-        if s["cells"] is None or s["cells"] < 1:
+            report.fail("data", f"{tag} 既没有 counts 也没有 metrics")
+
+        if has_counts and (s["cells"] is None or s["cells"] < 1):
             report.fail("data", f"{tag} cells 必须是 ≥1 的整数")
 
     # 图表同源
@@ -406,8 +441,11 @@ def check_data(report: Report, html: str, base: Path, profile: dict, html_path: 
         if re.search(r"data\s*:\s*\[\s*\d+\s*,", html):
             report.warn("data", "图表里可能有字面量数字数组，确认是否与阶段数据同源")
 
+        has_counts_all = all(any(x is not None for x in s["counts"]) for s in stages)
         readme = base / "README.md"
-        if readme.exists():
+        if not has_counts_all:
+            report.info("data", "metrics 型课件：README 数量表检查跳过，请人工核对指标表")
+        elif readme.exists():
             rows = parse_readme_table(read_text(readme))
             if rows is None:
                 report.warn("data", "README 未找到数量自检表")

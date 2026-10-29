@@ -1,0 +1,13 @@
+{
+  "type": "process",
+  "layout": "cockpit",
+  "theme": "glass",
+  "voiceMode": "required",
+  "quantityChart": "required",
+  "interactionLevel": "standard",
+  "offlineRequired": true,
+  "bundle": "libs",
+  "params": ["t", "voice", "simple"],
+  "publishMode": "local",
+  "knowledgeBase": ""
+}

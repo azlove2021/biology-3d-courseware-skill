@@ -1,19 +1,20 @@
 # 高中生物 3D 课件交付标准（WorkBuddy 技能）
 
-把「S-01 减数分裂全流程时间轴」验证过的交付方式固化为可复用技能。后续每个课件在**主题、语音、排版、专业性**上与第一个保持同一水准。
+把「铜匠实验室」54 门高中 3D 课件的公开设计语言，与 S-01 减数分裂的交付经验合并成一套可复用规范。v1.2 起版式从「六块面板」切换为**玻璃拟态教学驾驶舱**。
 
 - 📦 技能仓库：<https://github.com/azlove2021/biology-3d-courseware-skill>
-- 🧪 参考实现：<https://github.com/azlove2021/meiosis-3d-courseware>
+- 🌐 技能主页（GitHub Pages）：<https://azlove2021.github.io/biology-3d-courseware-skill/>
+- 🧬 样板课：<https://azlove2021.github.io/biology-3d-courseware-skill/demo/gene-expression/>
 
-## v1.1 的关键变化
+## v1.2 的关键变化
 
-- **三层规则**：通用底线（不可豁免）/ 类型专属（按 `type` 启用）/ 可选配置（`courseware-profile.json`）
-- **语音五态状态机**：`pending / speaking / ended / cancelled / error`，修掉"播放刚开始动画就抢跑"的竞态
-- **单一数据源**：HTML 内嵌 `<script type="application/json" id="courseware-data">`，图表、读数、README 表全部派生
-- **三层校验**：静态结构 / 数据一致性 / 浏览器运行（可选 Playwright）
-- **故障样例回归**：`tests/test_checker.py` 证明脚本能拦住已知错误，而不只是让正确项目通过
-- **离线与发布契约**：断网必须可运行；默认只落本地，公开仓库/Pages 需授权
-- **本机路径移出公共流程**：知识库位置改由 `courseware-profile.json` 或 `BIOLOGY_KB` 配置
+- **玻璃拟态教学驾驶舱**：顶栏 / 因果链 / 步骤条 / 左栏本步 / 中央 3D / 右栏中控台 / 底栏，七区一屏
+- **设计 token 重写**：主蓝 `#2F6BFF`、青 `#13B8C6`、紫 `#7C5CFF`；玻璃面板 `rgba(255,255,255,.72–.84)` + `blur(12px) saturate(150%)` + 16px 圆角
+- **内容结构**：6–9 步，最后一步固定「考核」；每步「问句 → 动手 → 应该看到 → 揭示结论 + 要点 / 易错点 / 考点」
+- **右栏中控台**：读数卡 + 滑块 + 迷你曲线 + 参考工况 / 复位
+- **`metrics` 数据**：除染色体计数外，支持连续指标（如转录进度、mRNA 长度、肽链长度）
+- **校验脚本升级**：识别驾驶舱 token/七区结构；支持 `metrics`；新增 `backdrop-filter`、`主线问题`、`本步`、`中控台`、`考核` 检查
+- **样板课**：`demo/gene-expression/`（基因的表达：转录与翻译），9 步、单 HTML、断网可用、0 阻断 / 0 警告
 
 ## 安装
 
@@ -35,29 +36,32 @@ C:\Users\<你的用户名>\.workbuddy-ai\skills\biology-3d-courseware\
 
 | 文件 | 用途 |
 |---|---|
-| `SKILL.md` | 三层规则 + 8 步流程 + 五层验收 + 常见坑 |
-| `references/theme-tokens.md` | 锁定色板、背景、布局、响应式、简洁模式、每课主色 |
+| `SKILL.md` | 三层规则 + 8 步流程 + 七区速查 + 五层验收 + 常见坑 |
+| `references/theme-tokens.md` | 玻璃拟态 token、单元色、组件、尺寸 |
+| `references/cockpit-layout.md` | 七区版式、内容结构、交互契约、验收 |
 | `references/voice-sync.md` | 五态语音状态机与完整代码 |
-| `references/stage-schema.md` | JSON 数据块、字段规范、数量自检、URL 参数 |
+| `references/stage-schema.md` | JSON 数据块、`counts` / `metrics`、URL 参数 |
 | `references/terms.md` | 术语口径与禁用表述速查 |
-| `references/courseware-types.md` | 时间轴 / 解剖 / 实验 / 对比四类范式 |
+| `references/courseware-types.md` | 四类课件范式与差异 |
 | `references/courseware-profile.md` | 配置字段、豁免规则、发布方式 |
-| `references/runtime-contract.md` | 离线契约、参数契约、浏览器验证、五层检查 |
+| `references/runtime-contract.md` | 离线契约、参数契约、浏览器验证 |
 | `references/local-config.md` | 本地知识库配置与取材顺序 |
-| `references/threejs-version.md` | r128 依赖记录、许可证、升级回归清单 |
+| `references/threejs-version.md` | three.js 依赖记录、许可证、升级回归 |
 | `references/delivery-checklist.md` | 交付前逐条勾选（A–J 十组） |
 | `scripts/check_courseware.py` | 三层校验：静态结构 / 数据一致性 / 浏览器运行 |
 | `scripts/smoke_test.py` | 可选 Playwright 冒烟测试（未安装时 SKIP） |
-| `tests/test_checker.py` | 校验脚本的故障样例回归（10 个用例） |
-| `assets/courseware-shell.html` | 可运行外壳模板（含 JSON 数据块与五态语音） |
+| `tests/test_checker.py` | 校验脚本的故障样例回归（12 个用例） |
+| `assets/courseware-shell.html` | 驾驶舱外壳模板（v1.2） |
 | `assets/courseware-profile.example.json` | 配置样例 |
+| `demo/gene-expression/` | 样板课：基因的表达（单 HTML + 截图 + 文档） |
+| `index.html` | 技能主页（GitHub Pages 根地址） |
 
 ## 使用
 
 在对话里说：
 
 - 「按课件交付标准做 S-02 ×××」
-- 「按第一个课件的标准改这个课件」
+- 「按铜匠实验室的标准改这个课件」
 - 「检查这个课件是否符合交付标准」
 
 或手动跑校验：
@@ -83,9 +87,9 @@ python tests/test_checker.py
 
 | 层 | 内容 | 是否可豁免 |
 |---|---|---|
-| 通用底线 | 科学准确、简化有说明、数据同源、交互可用、离线可运行、文档一致、发布授权 | 否 |
-| 类型专属 | 过程型阶段数组/曲线；解剖型爆炸视图/剖切；实验型滑杆/对照；对比型双场景/差异高亮 | 按类型 |
-| 可选配置 | `voiceMode` / `quantityChart` / `interactionLevel` / `publishMode` / `params` | 是，需写明理由 |
+| 通用底线 | 科学准确、简化有说明、数据同源、驾驶舱七区、交互可用、离线可运行、文档一致、发布授权 | 否 |
+| 类型专属 | 过程型阶段/指标；解剖型爆炸视图/剖切；实验型滑杆/对照；对比型双场景/差异高亮 | 按类型 |
+| 可选配置 | `layout` / `theme` / `bundle` / `voiceMode` / `quantityChart` / `interactionLevel` / `publishMode` / `params` | 是，需写明理由 |
 
 ## 兼容性
 
@@ -95,10 +99,12 @@ python tests/test_checker.py
 - 浏览器冒烟：Playwright + Chromium（可选，不装则跳过）
 - 未在其他技能加载器上逐项验证；如需移植，请先核对其 frontmatter 字段要求
 
-## 许可证
+## 设计来源与许可
 
-未指定许可证，默认保留所有权利。如需以 MIT、CC BY-NC 等协议开源，请先与作者确认后补充 `LICENSE`。
+- 设计语言参考 **铜匠实验室** <https://lab.tongjiang.app>（CC BY-NC 4.0）：只借鉴布局、配色、组件语言；**代码、文案、3D 模型、截图均为自研**
+- 技能本身未指定许可证，默认保留所有权利；如需以 MIT、CC BY-NC 等协议开源，请先与作者确认后补充 `LICENSE`
+- 课件内容依据人教版 2019；示意模型非真实比例
 
 ## 版本
 
-v1.1.0 · 2026-10-29 · 变更见 [CHANGELOG.md](CHANGELOG.md)
+v1.2.0 · 2026-10-29 · 变更见 [CHANGELOG.md](CHANGELOG.md)

@@ -30,13 +30,46 @@ VALID_JSON = """{
   ]
 }"""
 
+VALID_METRICS_JSON = """{
+  "meta": {"title": "指标型测试", "textbook": "人教版 2019", "chapter": "必修2 第4章第1节", "type": "process"},
+  "stages": [
+    {"id": "m1", "name": "起始", "short": "起", "group": "转录", "summary": "s", "narration": "n",
+     "events": ["e"], "metrics": [
+       {"key": "progress", "label": "转录进度", "value": 0, "unit": "%"},
+       {"key": "mrna", "label": "mRNA 长度", "value": 0, "unit": "nt"},
+       {"key": "peptide", "label": "肽链长度", "value": 0, "unit": "aa"}],
+     "scope": "每个细胞", "warning": "w", "question": "q", "source": "必修2 第4章第1节"},
+    {"id": "m2", "name": "延伸", "short": "伸", "group": "转录", "summary": "s", "narration": "n",
+     "events": ["e"], "metrics": [
+       {"key": "progress", "label": "转录进度", "value": 50, "unit": "%"},
+       {"key": "mrna", "label": "mRNA 长度", "value": 60, "unit": "nt"},
+       {"key": "peptide", "label": "肽链长度", "value": 0, "unit": "aa"}],
+     "scope": "每个细胞", "warning": "w", "question": "q", "source": "必修2 第4章第1节"},
+    {"id": "m3", "name": "翻译", "short": "译", "group": "翻译", "summary": "s", "narration": "n",
+     "events": ["e"], "metrics": [
+       {"key": "progress", "label": "转录进度", "value": 100, "unit": "%"},
+       {"key": "mrna", "label": "mRNA 长度", "value": 90, "unit": "nt"},
+       {"key": "peptide", "label": "肽链长度", "value": 30, "unit": "aa"}],
+     "scope": "每个细胞", "warning": "w", "question": "q", "source": "必修2 第4章第1节"}
+  ]
+}"""
+
 VALID_HTML = """<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-:root{--accent:#7c3aed;--accent2:#06b6d4;--ink:#1e293b;--muted:#64748b;--line:#e2e8f0;
---red:#ef4444;--blue:#3b82f6;--purple:#7c3aed;--cyan:#06b6d4;--orange:#f59e0b;}
-.bg{background:radial-gradient(circle,#fff,#eee)}
-@media(max-width:980px){body{font-size:12px}}
+:root{
+  --font:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --sci:#2F6BFF;--cyan:#13B8C6;--violet:#7C5CFF;--ok:#10B981;--warn:#F59E0B;--bad:#EF4444;
+  --ink:#0E1A2B;--glass:rgba(255,255,255,.84);--glass-blur:blur(12px) saturate(150%);
+  --shadow-2:0 10px 32px rgba(30,50,110,.14);--line:rgba(14,26,43,.08);--tint:#F3F7FF;
+  --r-panel:16px;--top-h:78px;--steps-h:46px;--foot-h:52px;
+  --panelw-l:clamp(320px,22vw,404px);--panelw-r:clamp(300px,20.5vw,348px);
+}
+.panel{background:var(--glass);backdrop-filter:var(--glass-blur);border-radius:var(--r-panel)}
 </style></head><body>
-<div>人教版 2019 · 必修2 · 示意 · 非真实比例 · 简洁模式</div>
+<header id="top">主线问题 · 因果链 · 下一步</header>
+<nav class="steps">1 2 3</nav>
+<aside class="left">本步</aside>
+<aside class="right">中控台</aside>
+<footer class="foot">上一步 下一步 考核 · 示意 · 非真实比例</footer>
 <canvas></canvas>
 <script type="application/json" id="courseware-data">__JSON__</script>
 <script src="libs/three.min.js"></script>
@@ -44,7 +77,7 @@ VALID_HTML = """<!DOCTYPE html><html><head><meta charset="utf-8"><style>
 document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"><\\/script>');
 const DATA=JSON.parse(document.getElementById('courseware-data').textContent);
 const STAGES=DATA.stages;
-const SERIES=STAGES.map(s=>s.counts.chromosome);
+const SERIES=STAGES.map(s=>s.counts?s.counts.chromosome:(s.metrics||[]).length);
 const synth=window.speechSynthesis;
 const u=new SpeechSynthesisUtterance('x'); u.lang='zh-CN'; u.onend=()=>{};
 let voiceState='pending', voiceToken=0;
@@ -101,6 +134,14 @@ class CheckerTests(unittest.TestCase):
             code, data = run_checker(Path(d))
             self.assertEqual(code, 0, data["errors"])
             self.assertEqual(data["summary"]["errors"], 0)
+
+    def test_metrics_project_passes(self):
+        with tempfile.TemporaryDirectory() as d:
+            html = VALID_HTML.replace("__JSON__", VALID_METRICS_JSON)
+            make_project(Path(d), html=html)
+            code, data = run_checker(Path(d))
+            self.assertEqual(code, 0, data["errors"])
+            self.assertTrue(any("metrics" in i["message"] for i in data["infos"]))
 
     def test_missing_local_libs_is_blocking(self):
         with tempfile.TemporaryDirectory() as d:
@@ -163,7 +204,7 @@ class CheckerTests(unittest.TestCase):
     def test_hardcoded_chart_is_warning(self):
         with tempfile.TemporaryDirectory() as d:
             html = VALID_HTML.replace("__JSON__", VALID_JSON).replace(
-                "const SERIES=STAGES.map(s=>s.counts.chromosome);",
+                "const SERIES=STAGES.map(s=>s.counts?s.counts.chromosome:(s.metrics||[]).length);",
                 "const SERIES=[4,4,2];")
             make_project(Path(d), html=html)
             code, data = run_checker(Path(d))
@@ -177,6 +218,15 @@ class CheckerTests(unittest.TestCase):
             code, data = run_checker(Path(d))
             self.assertEqual(code, 0)
             self.assertTrue(has_warn(data, "?voice"))
+
+    def test_missing_backdrop_filter_is_blocking_for_glass(self):
+        with tempfile.TemporaryDirectory() as d:
+            html = VALID_HTML.replace("__JSON__", VALID_JSON).replace(
+                "backdrop-filter:var(--glass-blur);", "")
+            make_project(Path(d), html=html)
+            code, data = run_checker(Path(d))
+            self.assertEqual(code, 1)
+            self.assertTrue(has_error(data, "backdrop-filter"))
 
 
 if __name__ == "__main__":
