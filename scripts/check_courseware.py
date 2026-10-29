@@ -34,6 +34,8 @@ DEFAULTS = {
     "voiceMode": "required",
     "quantityChart": "required",
     "interactionLevel": "standard",
+    "interaction3d": "orbit+pick",
+    "panelHide": "three",
     "offlineRequired": True,
     "bundle": "inline",
     "params": ["t", "voice", "simple"],
@@ -47,6 +49,8 @@ ALLOWED = {
     "voiceMode": {"required", "optional", "disabled"},
     "quantityChart": {"required", "optional", "disabled"},
     "interactionLevel": {"basic", "standard", "advanced"},
+    "interaction3d": {"none", "orbit", "orbit+pick"},
+    "panelHide": {"none", "one", "two", "three"},
     "bundle": {"inline", "libs"},
     "publishMode": {"local", "ask", "auto"},
 }
@@ -302,6 +306,44 @@ def check_static(report: Report, html: str, base: Path, profile: dict, html_path
             report.warn("static", "未见「上一步 / 下一步」导航")
         if "考核" not in html:
             report.warn("static", "未见「考核」环节（最后一步应固定为考核）")
+
+    # 3D 交互（v1.3 起的底线：能转、能缩放、能点选）
+    inter = profile.get("interaction3d", "orbit+pick")
+    if inter == "none":
+        report.warn("static", "interaction3d=none：3D 场景不可交互，交付说明里必须写豁免理由")
+    else:
+        if "pointerdown" not in html or "pointermove" not in html:
+            report.fail("static", "未实现指针拖拽：3D 场景无法旋转")
+        if not re.search(r"""addEventListener\(\s*['"]wheel['"]""", html) and "onwheel" not in html:
+            report.fail("static", "未监听 wheel：滚轮无法缩放")
+        if inter == "orbit+pick":
+            if "Raycaster" not in html:
+                report.fail("static", "未使用 Raycaster：结构点不中，学生只能看不能问「这是什么」")
+            if not re.search(r"pickCard|pick-card|pickcard|inspector", html, re.I):
+                report.warn("static", "未见点选信息卡（#pickCard），点选后没有说明")
+            if not re.search(r"PICK_INFO|pickInfo|data-pick", html):
+                report.warn("static", "未见结构说明数据（PICK_INFO / data-pick）")
+        if not re.search(r"camAuto|view\.auto|resumeAuto|回到预设|rGoal", html):
+            report.warn("static", "未见「用户接管视角 / 回到预设」逻辑，切步可能硬抢镜头")
+
+    # 高 DPI 布局陷阱（Tabbit 真机验收抓到的真 bug）：
+    # setSize(w,h,false) 不写 CSS 尺寸时，画布按设备像素布局——150% 缩放下画面放大裁切、点击映射全错
+    if re.search(r"""setSize\(\s*[\w.\[\]]+\s*,\s*[\w.\[\]]+\s*,\s*false\s*\)""", html):
+        css_ok = re.search(r"""(#gl|canvas)\s*\{[^}]*width\s*:\s*100%""", html)
+        if not css_ok:
+            report.fail("static",
+                        "setSize(...,false) 但 canvas 无 CSS width:100%：高 DPI（如 150% 系统缩放）下"
+                        "画布按设备像素布局，画面放大裁切、点选坐标映射全错")
+
+    # 面板可隐藏（投影时能全屏看实验）
+    hide_mode = profile.get("panelHide", "three")
+    if hide_mode != "none":
+        if not re.search(r"hide-l|hide-r|cinema|panel-hidden", html):
+            report.fail("static", "未实现讲解面板折叠：投影时无法全屏看实验")
+        if hide_mode == "three" and "cinema" not in html:
+            report.warn("static", "未见「影院模式」：三档折叠应含 左栏 / 右栏 / 影院")
+        if not re.search(r"togglePanel|panelVisible|hide-l", html):
+            report.warn("static", "未见面板切换逻辑（togglePanel / panelVisible）")
 
     # 专业性
     if "示意" not in html and "非真实比例" not in html:

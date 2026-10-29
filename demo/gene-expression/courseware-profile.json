@@ -5,6 +5,8 @@
   "voiceMode": "required",
   "quantityChart": "required",
   "interactionLevel": "standard",
+  "interaction3d": "orbit+pick",
+  "panelHide": "three",
   "offlineRequired": true,
   "bundle": "libs",
   "params": ["t", "voice", "simple"],

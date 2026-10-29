@@ -1,5 +1,33 @@
 # 变更记录
 
+## 1.3.0 — 2026-10-29
+
+补上 v1.2 最致命的缺口：**课件"能渲染但用不了"**——3D 不能转、不能缩放、点结构没反应，讲解卡片收不起来，投影时没法全屏看实验；而验收只跑了无头冒烟，测不出这些。
+
+### 新增
+
+- **3D 交互契约** `references/interaction-contract.md`
+  - 轨道控制器（拖拽旋转 / 滚轮缩放 / 右键平移 / `R` 复位），`view.auto` 区分自动取景与用户接管
+  - `Raycaster` 点选：高亮 + 选中框 + 信息卡；透明外壳 `fallback` 降级；隐藏对象 `chainVisible()` 排除；位移 <6px 且 <600ms 才算点击
+  - 双击聚焦、右栏「结构速查」8 格按钮（兼图例与点选入口）
+  - 面板三档折叠 `H` / `J` / `F` + `Shift+F` 全屏；窄屏改抽屉
+- **真机验收** `references/browser-testing.md`：Tabbit 登录态全流程（旋转→缩放→逐个点选→三档折叠→影院→语音→考核→断网→4 种分辨率），逐步截图
+- 配置新增 `interaction3d`（`orbit+pick` / `orbit` / `none`）与 `panelHide`（`three` / `two` / `one` / `none`）
+- `scripts/smoke_test.py` 扩为交互冒烟：拖拽改相机、滚轮改距离、点选开卡片、左栏折叠、`F` 进影院、断网重载
+- `tests/test_checker.py` 增至 **16 例**：新增"无 Raycaster / 无滚轮监听 / 无面板折叠 / 豁免可通过"四个用例
+
+### 变更
+
+- `SKILL.md` 铁律 9 → 12 条：新增「3D 必须可交互」「面板必须可隐藏」「Tabbit 真机验收不可跳过」
+- 执行流程 8 步 → 10 步：Step 4 建场景含交互、Step 5 面板折叠、Step 9 Tabbit 验收
+- `scripts/check_courseware.py`：交互与折叠改为**阻断项**（`interaction3d=none` / `panelHide=none` 可豁免但必须写理由）
+- 验收层次 5 → 6 层：新增「可用」
+
+### 修复（样板课）
+
+- 样板课 `demo/gene-expression/` 补齐全部交互；修复窄屏面板 `display:none` 后无入口
+- S-01 减数分裂标记 `interaction3d=orbit`、`panelHide=none`（legacy 豁免，理由写入 profile）
+
 ## 1.2.0 — 2026-10-29
 
 按「铜匠实验室」54 门高中 3D 课件的公开设计语言，整体切换版式。

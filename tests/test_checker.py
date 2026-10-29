@@ -64,11 +64,15 @@ VALID_HTML = """<!DOCTYPE html><html><head><meta charset="utf-8"><style>
   --panelw-l:clamp(320px,22vw,404px);--panelw-r:clamp(300px,20.5vw,348px);
 }
 .panel{background:var(--glass);backdrop-filter:var(--glass-blur);border-radius:var(--r-panel)}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:block}
+.left{transition:transform .2s} body.hide-l .left{opacity:0}
+body.hide-r .right{opacity:0} body.cinema .left{display:none}
 </style></head><body>
 <header id="top">主线问题 · 因果链 · 下一步</header>
 <nav class="steps">1 2 3</nav>
 <aside class="left">本步</aside>
 <aside class="right">中控台</aside>
+<div id="pickCard"></div>
 <footer class="foot">上一步 下一步 考核 · 示意 · 非真实比例</footer>
 <canvas></canvas>
 <script type="application/json" id="courseware-data">__JSON__</script>
@@ -85,6 +89,15 @@ const q=new URLSearchParams(location.search);
 q.get('t'); q.get('voice'); q.get('simple');
 let t=Math.min(2,Math.max(0,parseFloat(q.get('t'))||0));
 const scene=new THREE.Scene();
+const canvasEl=document.querySelector('canvas');
+let viewAuto=true;
+function resumeAuto(){viewAuto=true;}
+canvasEl.addEventListener('pointerdown',e=>{viewAuto=false;});
+canvasEl.addEventListener('pointermove',e=>{});
+canvasEl.addEventListener('wheel',e=>{e.preventDefault();},{passive:false});
+renderer.setSize(w, h, false);
+const raycaster=new THREE.Raycaster();
+const PICK_INFO={dna:{name:'DNA',desc:'模板'}};
 </script></body></html>"""
 
 VALID_README = """# 测试课件
@@ -227,6 +240,71 @@ class CheckerTests(unittest.TestCase):
             code, data = run_checker(Path(d))
             self.assertEqual(code, 1)
             self.assertTrue(has_error(data, "backdrop-filter"))
+
+    def test_no_raycaster_is_blocking(self):
+        with tempfile.TemporaryDirectory() as d:
+            html = VALID_HTML.replace("__JSON__", VALID_JSON).replace(
+                "const raycaster=new THREE.Raycaster();", "")
+            make_project(Path(d), html=html)
+            code, data = run_checker(Path(d))
+            self.assertEqual(code, 1)
+            self.assertTrue(has_error(data, "Raycaster"))
+
+    def test_no_zoom_listener_is_blocking(self):
+        with tempfile.TemporaryDirectory() as d:
+            html = VALID_HTML.replace("__JSON__", VALID_JSON).replace(
+                "canvasEl.addEventListener('wheel',e=>{e.preventDefault();},{passive:false});", "")
+            make_project(Path(d), html=html)
+            code, data = run_checker(Path(d))
+            self.assertEqual(code, 1)
+            self.assertTrue(has_error(data, "滚轮"))
+
+    def test_no_panel_hide_is_blocking(self):
+        with tempfile.TemporaryDirectory() as d:
+            html = VALID_HTML.replace("__JSON__", VALID_JSON).replace(
+                "body.hide-l .left{opacity:0}", "").replace(
+                "body.hide-r .right{opacity:0}", "").replace(
+                "body.cinema .left{display:none}", "")
+            make_project(Path(d), html=html)
+            code, data = run_checker(Path(d))
+            self.assertEqual(code, 1)
+            self.assertTrue(has_error(data, "面板折叠"))
+
+    def test_interaction_exemption_passes(self):
+        with tempfile.TemporaryDirectory() as d:
+            html = VALID_HTML.replace("__JSON__", VALID_JSON).replace(
+                "const raycaster=new THREE.Raycaster();", "").replace(
+                "body.hide-l .left{opacity:0}", "").replace(
+                "body.hide-r .right{opacity:0}", "").replace(
+                "body.cinema .left{display:none}", "")
+            make_project(Path(d), html=html)
+            (Path(d) / "courseware-profile.json").write_text(json.dumps({
+                "interaction3d": "none",
+                "panelHide": "none",
+                "exemptions": {"interaction3d": "静态剖面图课件，无自由视角需求"}
+            }, ensure_ascii=False), encoding="utf-8")
+            code, data = run_checker(Path(d))
+            self.assertEqual(code, 0, data["errors"])
+            self.assertTrue(any("interaction3d=none" in w["message"] for w in data["warnings"]))
+
+    def test_setsize_false_without_css_width_is_blocking(self):
+        # Tabbit 真机抓到的真 bug：150% 缩放下画布按设备像素布局，点击映射全错
+        with tempfile.TemporaryDirectory() as d:
+            html = VALID_HTML.replace("__JSON__", VALID_JSON).replace(
+                "width:100%;height:100%;", "")
+            make_project(Path(d), html=html)
+            code, data = run_checker(Path(d))
+            self.assertEqual(code, 1)
+            self.assertTrue(has_error(data, "width:100%"))
+
+    def test_setsize_false_with_css_width_passes(self):
+        with tempfile.TemporaryDirectory() as d:
+            html = VALID_HTML.replace("__JSON__", VALID_JSON).replace(
+                ".left{transition:transform .2s}",
+                "#gl{position:fixed;inset:0;width:100%;height:100%}\n.left{transition:transform .2s}")
+            make_project(Path(d), html=html)
+            code, data = run_checker(Path(d))
+            self.assertEqual(code, 0, data["errors"])
 
 
 if __name__ == "__main__":

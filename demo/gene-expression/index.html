@@ -40,7 +40,7 @@ body::after{
   background-size:22px 22px;opacity:.30;
   mask-image:radial-gradient(ellipse 80% 70% at 50% 45%,#000 30%,transparent 80%);
 }
-#gl{position:fixed;inset:0;z-index:1;display:block}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:block}
 #labels{position:fixed;inset:0;z-index:6;pointer-events:none;overflow:hidden}
 .tag{
   position:absolute;transform:translate(-50%,-50%);white-space:nowrap;
@@ -133,6 +133,17 @@ kbd{font:11px var(--num);padding:0 3px;border-radius:4px;background:var(--tint);
 .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;padding-top:8px;border-top:1px solid var(--line);font-size:10px;color:var(--ink3)}
 .legend span{display:inline-flex;align-items:center;gap:4px}
 .legend i{width:8px;height:8px;border-radius:3px;display:inline-block}
+.structhead{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:9px;
+  padding-top:8px;border-top:1px solid var(--line);font-size:10.5px;color:var(--ink3)}
+.structhead b{color:var(--ink2);font-weight:800;font-size:10.5px}
+.structhead span{font-size:9px;opacity:.85}
+.structs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:5px}
+.st{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1px solid var(--line);
+  border-radius:8px;background:var(--glass-2);font-size:10.5px;color:var(--ink2);
+  cursor:pointer;text-align:left;font-family:inherit}
+.st:hover{border-color:var(--sci-30);background:var(--sci-4);color:var(--sci)}
+.st.on{border-color:var(--sci);background:var(--sci-12);color:var(--sci);font-weight:700}
+.st i{width:7px;height:7px;border-radius:2px;flex:0 0 auto}
 .actions{display:flex;gap:6px;margin:8px 0 6px}
 .units{display:flex;gap:4px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:7px;margin-top:6px}
 .unit{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:var(--r-pill);
@@ -171,6 +182,47 @@ kbd{font:11px var(--num);padding:0 3px;border-radius:4px;background:var(--tint);
   backdrop-filter:var(--glass-blur);font-size:11px;color:var(--ink2)}
 .eqb b{color:var(--ucs);font-weight:800;white-space:nowrap}
 .eqb span{white-space:nowrap}
+/* ===== 交互层：视角条 / 选中卡 / 面板折叠 / 影院 ===== */
+.left,.right{transition:transform .24s ease,opacity .2s ease}
+body.hide-l .left{transform:translateX(calc(-100% - 14px));opacity:0;pointer-events:none}
+body.hide-r .right{transform:translateX(calc(100% + 14px));opacity:0;pointer-events:none}
+#viewBar{position:fixed;left:50%;transform:translateX(-50%);bottom:110px;z-index:18;
+  display:flex;align-items:center;gap:2px;padding:3px 5px;border-radius:var(--r-pill);
+  background:var(--glass);border:var(--glass-edge);box-shadow:var(--shadow-2);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur)}
+#viewBar .vb{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  border:1px solid transparent;background:transparent;color:var(--ink2);cursor:pointer;
+  font-size:13px;line-height:1;padding:0}
+#viewBar .vb:hover{background:var(--sci-8);border-color:var(--sci-30);color:var(--sci)}
+#viewBar .vb.on{background:var(--sci-12);border-color:var(--sci-30);color:var(--sci)}
+#viewBar .vsep{width:1px;height:15px;background:var(--line);margin:0 2px}
+#viewBar .vlab{font-size:9.5px;color:var(--ink3);padding:0 5px;white-space:nowrap;letter-spacing:.2px}
+#pickCard{position:fixed;right:calc(var(--panelw-r) + 22px);bottom:150px;width:292px;z-index:19;
+  padding:10px 12px 9px;border-radius:var(--r-card);background:var(--glass-back);
+  border:var(--glass-edge);box-shadow:var(--shadow-2);backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);transform:translateY(8px);opacity:0;
+  pointer-events:none;transition:.18s}
+#pickCard.on{transform:none;opacity:1;pointer-events:auto}
+body.hide-r #pickCard{right:22px}
+#tgLeft.on,#tgRight.on,#tgCinema.on{background:var(--sci-12);border-color:var(--sci-30);color:var(--sci);box-shadow:none}
+.pc-h{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.pc-h b{font-size:13px;font-weight:800}
+.pc-x{margin-left:auto;border:0;background:transparent;color:var(--ink3);cursor:pointer;font-size:15px;line-height:1;padding:0 2px}
+#pickCard p{margin:0;font-size:11.5px;line-height:1.65;color:var(--ink2)}
+.pc-k{font-size:9.5px;color:var(--ink3);margin-top:6px;border-top:1px solid var(--line);padding-top:5px;line-height:1.5}
+#cineBar{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:26;display:none;
+  align-items:center;gap:5px;padding:5px 8px;border-radius:var(--r-pill);
+  background:var(--glass-back);border:var(--glass-edge);box-shadow:var(--shadow-2);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur)}
+body.cinema #cineBar{display:flex}
+body.cinema #top,body.cinema .steps,body.cinema .left,body.cinema .right,
+body.cinema .foot,body.cinema .eqb{display:none!important}
+body.cinema #viewBar{bottom:18px}
+body.cinema #pickCard{bottom:64px;right:18px}
+#toast{position:fixed;left:50%;top:152px;transform:translate(-50%,-6px);z-index:30;
+  padding:6px 13px;border-radius:var(--r-pill);background:rgba(14,26,43,.88);color:#fff;
+  font-size:11.5px;opacity:0;pointer-events:none;transition:.25s;white-space:nowrap}
+#toast.on{opacity:1;transform:translate(-50%,0)}
 .modal{position:fixed;inset:0;z-index:50;background:rgba(14,26,43,.35);backdrop-filter:blur(4px);
   display:grid;place-items:center;padding:20px}
 .modal[hidden]{display:none}
@@ -189,11 +241,20 @@ kbd{font:11px var(--num);padding:0 3px;border-radius:4px;background:var(--tint);
 body[data-unit="0"]{--uc:#0D7A8C;--ucs:#0B6979;--uh:rgba(13,122,140,.10)}
 body[data-unit="1"]{--uc:#2F6BFF;--ucs:#1E4FD6;--uh:rgba(47,107,255,.08)}
 body[data-unit="2"]{--uc:#9333EA;--ucs:#7C2BC4;--uh:rgba(147,51,234,.10)}
+@media(max-width:1280px){ .status{display:none} }
 @media(max-width:1100px){
-  .left,.right{display:none}
+  /* 窄屏：左右栏改为抽屉，按钮仍可唤出，不再直接消失 */
+  .left,.right{width:min(340px,86vw);z-index:24;transition:transform .22s ease}
+  .left{transform:translateX(calc(-100% - 14px));box-shadow:var(--shadow-2)}
+  .right{transform:translateX(calc(100% + 14px));box-shadow:var(--shadow-2)}
+  body.show-l .left,body.show-r .right{transform:none}
+  body.hide-l .left,body.hide-r .right{transform:translateX(calc(-100% - 14px))}
+  body.hide-r .right{transform:translateX(calc(100% + 14px))}
   .mq{display:none}
   .eqb{bottom:70px}
   .keys{display:none}
+  #pickCard{right:12px;left:12px;width:auto;bottom:152px}
+  #viewBar{bottom:108px}
 }
 @media(max-width:760px){
   .brand h1{font-size:14px}.brand p{display:none}
@@ -217,7 +278,9 @@ body[data-unit="2"]{--uc:#9333EA;--ucs:#7C2BC4;--uh:rgba(147,51,234,.10)}
     <span class="score">得分 <b id="score">0</b></span>
     <button class="btn" id="quizBtn">检测 <kbd>Q</kbd></button>
     <button class="btn" id="helpBtn">玩法</button>
-    <button class="btn" id="fullBtn">全屏 <kbd>F</kbd></button>
+    <button class="btn on" id="tgLeft">讲解 <kbd>H</kbd></button>
+    <button class="btn on" id="tgRight">中控 <kbd>J</kbd></button>
+    <button class="btn" id="tgCinema">影院 <kbd>F</kbd></button>
     <button class="btn on" id="voiceBtn">语音 <kbd>V</kbd></button>
   </div>
   <div class="chain" id="chain">
@@ -275,15 +338,42 @@ body[data-unit="2"]{--uc:#9333EA;--ucs:#7C2BC4;--uh:rgba(147,51,234,.10)}
     <button class="btn" id="preset">参考工况</button>
     <button class="btn danger" id="stop">复位本步</button>
   </div>
-  <div class="legend">
-    <span><i style="background:#2F6BFF"></i>DNA</span>
-    <span><i style="background:#13B8C6"></i>mRNA</span>
-    <span><i style="background:#F59E0B"></i>核糖体</span>
-    <span><i style="background:#7C5CFF"></i>酶 / tRNA</span>
-  </div>
+  <div class="structhead"><b>结构速查</b><span>点一下＝选中并聚焦</span></div>
+  <div class="structs" id="structs"></div>
 </aside>
 
 <div class="eqb" id="eq"><b>本步关系</b><span id="eqText">DNA → mRNA → 蛋白质</span></div>
+
+<!-- 视角条：任何模式下都可用 -->
+<div id="viewBar">
+  <button class="vb" id="vOut" title="缩小（滚轮）">−</button>
+  <button class="vb" id="vIn" title="放大（滚轮）">＋</button>
+  <span class="vsep"></span>
+  <button class="vb" id="vReset" title="回到本步预设视角（R）">⟲</button>
+  <button class="vb" id="vSpin" title="自动缓慢旋转">↻</button>
+  <span class="vsep"></span>
+  <span class="vlab">拖拽旋转 · 滚轮缩放 · 点结构看说明 · 双击聚焦</span>
+</div>
+
+<!-- 结构信息卡：点选 3D 结构后出现 -->
+<div id="pickCard">
+  <div class="pc-h"><span class="chip violet" id="pcTag">结构</span><b id="pcName">—</b>
+    <button class="pc-x" id="pcClose" title="关闭">×</button></div>
+  <p id="pcDesc"></p>
+  <div class="pc-k" id="pcTip"></div>
+</div>
+
+<!-- 影院模式胶囊 -->
+<div id="cineBar">
+  <button class="btn" id="cineExit">退出影院 <kbd>Esc</kbd></button>
+  <button class="btn" id="cinePrev">‹</button>
+  <span class="chip" id="cineStep">1 / 9</span>
+  <button class="btn" id="cineNext">›</button>
+  <button class="btn" id="cineVoice">语音</button>
+  <button class="btn" id="cineFull" title="浏览器全屏">⛶</button>
+</div>
+
+<div id="toast"></div>
 
 <footer class="foot panel">
   <button class="btn" id="prev">‹ 上一步</button>
@@ -291,7 +381,7 @@ body[data-unit="2"]{--uc:#9333EA;--ucs:#7C2BC4;--uh:rgba(147,51,234,.10)}
   <button class="btn pri" id="next">下一步 ›</button>
   <button class="btn" id="autoBtn">自动讲课</button>
   <span class="disclaimer">示意声明：分子大小与时间均为示意；碱基配对为教学简化；转录与翻译已放慢。示意 · 非真实比例。</span>
-  <span class="keys">← → 翻步 · 1–9 跳步 · Q 检测 · F 全屏</span>
+  <span class="keys">← → 翻步 · 1–9 跳步 · Q 检测 · H/J 面板 · F 影院 · R 视角</span>
 </footer>
 
 <div class="modal" id="quiz" hidden>
@@ -307,10 +397,12 @@ body[data-unit="2"]{--uc:#9333EA;--ucs:#7C2BC4;--uh:rgba(147,51,234,.10)}
     <div class="qhead"><b>玩法</b><button class="btn" id="helpClose">×</button></div>
     <ol class="help-list">
       <li>点「下一步」按顺序讲课；也可以点顶部步骤条或按 <kbd>1–9</kbd> 跳步。</li>
-      <li>左栏是「本步」脚本：先看问句，再按提示动手，最后点「揭示结论」。</li>
-      <li>右栏「中控台」可以拖演示速度、开关碱基/tRNA/核糖体，观察 3D 与读数的变化。</li>
-      <li>点「检测」做 3 道考核题；得分显示在顶栏。</li>
-      <li>「自动讲课」会在每段旁白读完后自动进入下一步。</li>
+      <li><b>3D 场景可以自由看</b>：按住左键拖拽旋转，滚轮缩放，右键或 <kbd>Shift</kbd>+拖拽平移；<kbd>R</kbd> 回到本步预设视角。</li>
+      <li><b>点任意结构看说明</b>：点 DNA、mRNA、核糖体、tRNA、肽链等，会高亮并弹出功能卡；<b>双击</b>直接聚焦到该结构。</li>
+      <li>左栏是「本步」脚本：先看问句，再按提示动手，最后点「揭示结论」。<kbd>H</kbd> 收起左栏。</li>
+      <li>右栏「中控台」可以拖演示速度、开关碱基/tRNA/核糖体，观察 3D 与读数的变化。<kbd>J</kbd> 收起右栏。</li>
+      <li>要全屏看实验：按 <kbd>F</kbd> 进入影院模式（左右栏、顶栏、底栏全隐，只留一条胶囊）；<kbd>Esc</kbd> 退出。</li>
+      <li>点「检测」做 3 道考核题；得分显示在顶栏。「自动讲课」会在每段旁白读完后自动进入下一步。</li>
     </ol>
   </div>
 </div>
@@ -850,6 +942,7 @@ scene.add(ribo);
 
 /* tRNA */
 const trnas = [];
+const trnaGroup = new THREE.Group(); scene.add(trnaGroup);
 for(let i=0;i<3;i++){
   const g = new THREE.Group();
   const c1 = new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.5,8),
@@ -862,7 +955,7 @@ for(let i=0;i<3;i++){
     new THREE.MeshStandardMaterial({color:[0xEF4444,0x10B981,0xF59E0B][i]}));
   aa.position.set(.3,.5,0);
   g.add(c1,c2,aa); g.position.set(1.0+i*.18,-.1,.6); g.visible = false;
-  scene.add(g); trnas.push(g);
+  trnaGroup.add(g); trnas.push(g);
 }
 
 /* 肽链 */
@@ -900,10 +993,269 @@ const camPos = new THREE.Vector3(...CAM[0].p);
 const camTgt = new THREE.Vector3(...CAM[0].t);
 camera.position.copy(camPos); camera.lookAt(camTgt);
 
+/* ================= 视角交互：轨道 / 缩放 / 平移 / 点选 ================= */
+const view = { auto:true, spin:false };
+const vDes = { theta:0, phi:1.15, r:12, tx:0, ty:0, tz:0 };
+const vCur = { ...vDes };
+const LIM = { minR:2.2, maxR:28, minPhi:.20, maxPhi:Math.PI-.20 };
+let dragState = null;
+
+function syncView(){
+  const off = camera.position.clone().sub(camTgt);
+  const len = off.length() || 1;
+  vCur.r = vDes.r = Math.max(LIM.minR, Math.min(LIM.maxR, len));
+  vCur.theta = vDes.theta = Math.atan2(off.x, off.z);
+  vCur.phi = vDes.phi = Math.acos(Math.max(-1, Math.min(1, off.y / len)));
+  vCur.tx = vDes.tx = camTgt.x; vCur.ty = vDes.ty = camTgt.y; vCur.tz = vDes.tz = camTgt.z;
+}
+function resumeAuto(){
+  camPos.copy(camera.position);
+  camTgt.set(vCur.tx, vCur.ty, vCur.tz);
+  view.auto = true;
+}
+function zoomBy(f){
+  if(view.auto) syncView();
+  view.auto = false;
+  vDes.r = Math.max(LIM.minR, Math.min(LIM.maxR, vDes.r * f));
+}
+function updateViewCamera(dt){
+  if(view.spin && !dragState) vDes.theta += dt * .32;
+  const k = 1 - Math.pow(.0015, dt);
+  vCur.theta += (vDes.theta - vCur.theta) * k;
+  vCur.phi   += (vDes.phi   - vCur.phi)   * k;
+  vCur.r     += (vDes.r     - vCur.r)     * k;
+  vCur.tx    += (vDes.tx    - vCur.tx)    * k;
+  vCur.ty    += (vDes.ty    - vCur.ty)    * k;
+  vCur.tz    += (vDes.tz    - vCur.tz)    * k;
+  const sp = Math.sin(vCur.phi);
+  camera.position.set(
+    vCur.tx + vCur.r * sp * Math.sin(vCur.theta),
+    vCur.ty + vCur.r * Math.cos(vCur.phi),
+    vCur.tz + vCur.r * sp * Math.cos(vCur.theta)
+  );
+  camera.lookAt(vCur.tx, vCur.ty, vCur.tz);
+}
+
+/* ---- 拾取：结构 → 说明卡 ---- */
+const PICK_INFO = {
+  nucleus:{ name:'细胞核', tag:'场所', desc:'核膜包被的细胞结构，内含 DNA。转录（DNA→mRNA）在这里发生，所以 mRNA 必须先出核才能翻译。', tip:'考点：转录在核内，翻译在细胞质中的核糖体上。' },
+  pore:{ name:'核孔', tag:'通道', desc:'核膜上的孔道，mRNA 加工完成后由此进入细胞质。大分子进出细胞核具有选择性。', tip:'mRNA 通过核孔出核，不是「穿膜扩散」。' },
+  dna:{ name:'DNA（基因）', tag:'模板', desc:'两条反向平行的脱氧核苷酸链盘成双螺旋。转录时只以其中一条链（模板链）为模板，碱基配对为 A—U、T—A、G—C、C—G。', tip:'易错：转录不是整条 DNA 都解旋，只解旋基因所在片段。' },
+  pol:{ name:'RNA 聚合酶', tag:'酶', desc:'结合在启动子上，使 DNA 局部解旋，并按模板链的碱基顺序把核糖核苷酸连成 mRNA，沿模板链 3′→5′ 移动。', tip:'RNA 聚合酶同时具有解旋和聚合两种作用。' },
+  mrna:{ name:'mRNA', tag:'信使', desc:'单链，含 U 不含 T，碱基顺序与模板链互补。每三个相邻碱基是一个密码子，决定一个氨基酸。', tip:'mRNA 长度随转录进度增长；出核后才开始翻译。' },
+  ribo:{ name:'核糖体', tag:'装配机', desc:'翻译的场所，由 rRNA 和蛋白质组成，有 mRNA 结合位点和 tRNA 结合位点。沿 mRNA 5′→3′ 移动，逐个读取密码子。', tip:'一条 mRNA 可结合多个核糖体，同时合成多条相同的肽链。' },
+  trna:{ name:'tRNA', tag:'搬运工', desc:'三叶草形，一端是反密码子，与 mRNA 的密码子互补配对；另一端携带对应的氨基酸。共 61 种。', tip:'起始 tRNA 的反密码子是 UAC，对应起始密码子 AUG（甲硫氨酸）。' },
+  peptide:{ name:'肽链', tag:'产物', desc:'氨基酸通过脱水缩合连成的链。翻译从起始密码子开始，到终止密码子结束，肽链随后折叠、加工才成为有功能的蛋白质。', tip:'肽链长度按氨基酸个数计；终止密码子不编码氨基酸。' }
+};
+const PICK_OBJ = {};
+const PICK_ROOTS = [];
+function regPick(obj, id){
+  obj.traverse(o=>{ o.userData.pickId = id; });
+  obj.userData.pickId = id;
+  if(!PICK_OBJ[id]) PICK_OBJ[id] = obj;
+  PICK_ROOTS.push(obj);
+}
+function rootsOf(id){ return PICK_ROOTS.filter(o=>o.userData.pickId === id); }
+function bboxOf(id){
+  const b = new THREE.Box3();
+  rootsOf(id).forEach(o=>b.expandByObject(o));
+  return b;
+}
+regPick(nucleus, 'nucleus');
+regPick(pore, 'pore');
+regPick(dnaGroup, 'dna');
+regPick(pol, 'pol');
+regPick(mrnaTube, 'mrna');
+regPick(mrnaLine, 'mrna');
+regPick(mrnaBases, 'mrna');
+regPick(ribo, 'ribo');
+regPick(trnaGroup, 'trna');
+regPick(peptideGroup, 'peptide');
+
+/* 右栏「结构速查」：既是图例，也是点选入口 */
+const STRUCT_LIST = [
+  ['nucleus', '#9EC5FF'], ['pore', '#7C5CFF'], ['dna', '#2F6BFF'], ['pol', '#8B5CF6'],
+  ['mrna', '#13B8C6'], ['ribo', '#F59E0B'], ['trna', '#7C5CFF'], ['peptide', '#10B981']
+];
+STRUCT_LIST.forEach(([id, color])=>{
+  const b = document.createElement('button');
+  b.className = 'st'; b.dataset.pick = id;
+  b.innerHTML = `<i style="background:${color}"></i>${PICK_INFO[id].name.replace(/（.*?）/,'')}`;
+  b.onclick = ()=>{ selectPick(id); focusPick(id); };
+  $('structs').appendChild(b);
+});
+function syncStructBtns(){
+  document.querySelectorAll('.st').forEach(b=>b.classList.toggle('on', b.dataset.pick === pickId));
+}
+
+const raycaster = new THREE.Raycaster();
+raycaster.params.Line.threshold = .06;
+raycaster.params.Points.threshold = .05;
+const ndc = new THREE.Vector2();
+const glCanvas = renderer.domElement;
+glCanvas.style.touchAction = 'none';
+
+function chainVisible(o){ while(o){ if(o.visible === false) return false; o = o.parent; } return true; }
+function pickAt(x, y, select){
+  const r = glCanvas.getBoundingClientRect();
+  ndc.set(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(ndc, camera);
+  const hits = raycaster.intersectObjects(PICK_ROOTS, true);
+  let fallback = null;                      // 核膜是半透明容器，不能挡住里面的结构
+  for(const h of hits){
+    let o = h.object, id = null;
+    while(o){ if(o.userData.pickId){ id = o.userData.pickId; break; } o = o.parent; }
+    if(!id || !chainVisible(h.object)) continue;
+    if(id === 'nucleus'){ if(!fallback) fallback = id; continue; }
+    if(select) selectPick(id);
+    return id;
+  }
+  if(fallback){ if(select) selectPick(fallback); return fallback; }
+  if(select) clearPick();
+  return null;
+}
+
+/* 选中框 + 高亮 */
+const selBox = new THREE.LineSegments(
+  new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1)),
+  new THREE.LineBasicMaterial({ color:0x2F6BFF, transparent:true, opacity:.85 })
+);
+selBox.visible = false; selBox.renderOrder = 6; scene.add(selBox);
+let pickId = null;
+const selMats = [];
+function clearPick(){
+  if(pickId && PICK_OBJ[pickId]){ /* 恢复发光 */ }
+  selMats.forEach(it=>{ it.m.emissive.setHex(it.hex); it.m.emissiveIntensity = it.int; });
+  selMats.length = 0;
+  pickId = null; selBox.visible = false;
+  syncStructBtns();
+  const card = $('pickCard'); if(card) card.classList.remove('on');
+}
+function selectPick(id){
+  const obj = PICK_OBJ[id];
+  if(!obj) return;
+  clearPick();
+  pickId = id;
+  const info = PICK_INFO[id] || { name:id, tag:'结构', desc:'', tip:'' };
+  $('pcName').textContent = info.name;
+  $('pcTag').textContent = info.tag;
+  $('pcDesc').textContent = info.desc;
+  $('pcTip').textContent = info.tip;
+  $('pickCard').classList.add('on');
+  syncStructBtns();
+  rootsOf(id).forEach(root=>root.traverse(o=>{
+    const m = o.material;
+    if(m && m.emissive){
+      selMats.push({ m, hex:m.emissive.getHex(), int:m.emissiveIntensity });
+      m.emissive.setHex(0x2F6BFF); m.emissiveIntensity = .5;
+    }
+  }));
+  refreshSelBox();
+}
+function refreshSelBox(){
+  if(!pickId) return;
+  const b = bboxOf(pickId);
+  if(b.isEmpty()){ selBox.visible = false; return; }
+  const c = b.getCenter(new THREE.Vector3()), s = b.getSize(new THREE.Vector3());
+  selBox.position.copy(c);
+  selBox.scale.set(Math.max(.14, s.x) * 1.14, Math.max(.14, s.y) * 1.14, Math.max(.14, s.z) * 1.14);
+  selBox.visible = true;
+}
+function focusPick(id){
+  const obj = PICK_OBJ[id]; if(!obj) return;
+  if(view.auto) syncView();
+  view.auto = false;
+  const b = bboxOf(id);
+  const c = b.getCenter(new THREE.Vector3()), s = b.getSize(new THREE.Vector3()).length();
+  vDes.tx = c.x; vDes.ty = c.y; vDes.tz = c.z;
+  vDes.r = Math.max(4.5, Math.min(LIM.maxR, Math.max(vCur.r * .62, s * 1.7)));
+  selectPick(id);
+  toast('已聚焦：' + (PICK_INFO[id] ? PICK_INFO[id].name : id));
+}
+
+/* 指针：左键旋转 / 右键或 Shift 平移 / 滚轮缩放 / 单击选中 / 双击聚焦 */
+function beginDrag(e, mode){
+  dragState = { mode, x:e.clientX, y:e.clientY, moved:0, t:performance.now() };
+  if(view.auto) syncView();
+  view.auto = false;
+  try{ glCanvas.setPointerCapture(e.pointerId); }catch(_){}
+}
+glCanvas.addEventListener('pointerdown', e=>{
+  if(e.button === 2 || e.shiftKey) beginDrag(e, 'pan');
+  else if(e.button === 0) beginDrag(e, 'orbit');
+});
+glCanvas.addEventListener('pointermove', e=>{
+  if(!dragState) return;
+  const dx = e.clientX - dragState.x, dy = e.clientY - dragState.y;
+  dragState.x = e.clientX; dragState.y = e.clientY;
+  dragState.moved += Math.abs(dx) + Math.abs(dy);
+  if(dragState.mode === 'orbit'){
+    vDes.theta -= dx * .0062;
+    vDes.phi = Math.max(LIM.minPhi, Math.min(LIM.maxPhi, vDes.phi - dy * .0052));
+  }else{
+    const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+    const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
+    const s = vCur.r * .0017;
+    vDes.tx += (-right.x * dx + up.x * dy) * s;
+    vDes.ty += (-right.y * dx + up.y * dy) * s;
+    vDes.tz += (-right.z * dx + up.z * dy) * s;
+  }
+});
+glCanvas.addEventListener('pointerup', e=>{
+  const d = dragState; dragState = null;
+  if(!d) return;
+  if(d.moved < 6 && performance.now() - d.t < 600) pickAt(e.clientX, e.clientY, true);
+});
+glCanvas.addEventListener('pointercancel', ()=>{ dragState = null; });
+glCanvas.addEventListener('contextmenu', e=>e.preventDefault());
+glCanvas.addEventListener('wheel', e=>{
+  e.preventDefault();
+  zoomBy(e.deltaY > 0 ? 1.12 : 1 / 1.12);
+}, { passive:false });
+glCanvas.addEventListener('dblclick', e=>{
+  const id = pickAt(e.clientX, e.clientY, false);
+  if(id) focusPick(id);
+});
+
+/* ================= 面板折叠 / 影院 / 提示 ================= */
+const narrowMQ = matchMedia('(max-width:1100px)');
+function panelVisible(side){
+  if(narrowMQ.matches) return document.body.classList.contains('show-' + side);
+  return !document.body.classList.contains('hide-' + side);
+}
+function syncPanelBtns(){
+  $('tgLeft').classList.toggle('on', panelVisible('l'));
+  $('tgRight').classList.toggle('on', panelVisible('r'));
+}
+function togglePanel(side){
+  const b = document.body;
+  if(narrowMQ.matches){
+    b.classList.toggle('show-' + side);
+    b.classList.remove('show-' + (side === 'l' ? 'r' : 'l'));
+  }else{
+    b.classList.toggle('hide-' + side);
+  }
+  syncPanelBtns();
+}
+function updateCineBar(){
+  $('cineStep').textContent = (curStep + 1) + ' / ' + N + ' · ' + STAGES[curStep].short;
+}
+function setCinema(on){
+  document.body.classList.toggle('cinema', on);
+  $('tgCinema').classList.toggle('on', on);
+  if(on){ updateCineBar(); clearPick(); }
+}
+let toastTimer = 0;
+function toast(msg){
+  const el = $('toast'); el.textContent = msg; el.classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove('on'), 1900);
+}
+
 /* ================= 状态与渲染 ================= */
 let t = 0, targetT = 0, curStep = 0, auto = false, voiceOn = true, speed = 1;
 let basesOn = true, trnaOn = true, riboOn = true;
 const lerp = (a,b,k) => a + (b-a)*k;
+let lastDt = 1/60;   // 由主循环更新，供与帧率无关的插值使用
 
 function apply(tt, now){
   const i0 = Math.max(0, Math.min(N-1, Math.floor(tt)));
@@ -936,8 +1288,10 @@ function apply(tt, now){
   const gp = new THREE.Vector3(lerp(p0[0],p1[0],k), lerp(p0[1],p1[1],k), lerp(p0[2],p1[2],k));
   const g0 = CAM[i0].t, g1 = CAM[i1].t;
   const gt = new THREE.Vector3(lerp(g0[0],g1[0],k), lerp(g0[1],g1[1],k), lerp(g0[2],g1[2],k));
-  camPos.lerp(gp, .08); camTgt.lerp(gt, .08);
-  camera.position.copy(camPos); camera.lookAt(camTgt);
+  // 与帧率无关的机位收敛：60fps 约 1s 到位，后台标签页 3fps 也约 1s（不再拖 10 秒）
+  const kk = 1 - Math.pow(.0005, lastDt);
+  camPos.lerp(gp, kk); camTgt.lerp(gt, kk);
+  if(view.auto){ camera.position.copy(camPos); camera.lookAt(camTgt); }
 }
 
 /* ================= 标签 ================= */
@@ -1057,6 +1411,9 @@ function goStep(i){
   cancelVoice();
   curStep = i; targetT = i;
   setStepUI(i);
+  clearPick();
+  resumeAuto();                       // 切步回预设机位（用户手动视角在下一步交还自动）
+  if(document.body.classList.contains('cinema')) updateCineBar();
   if(voiceOn && voiceReady && synth) setTimeout(()=>{ if(targetT===i) speakStage(i); }, 350);
 }
 
@@ -1102,7 +1459,23 @@ $('autoBtn').onclick = e=>{
   e.currentTarget.classList.toggle('on', auto);
   e.currentTarget.textContent = auto ? '自动讲课中' : '自动讲课';
 };
-$('fullBtn').onclick = ()=> document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+/* 面板 / 影院 / 视角 / 选中卡 */
+$('tgLeft').onclick = ()=>togglePanel('l');
+$('tgRight').onclick = ()=>togglePanel('r');
+$('tgCinema').onclick = ()=>setCinema(!document.body.classList.contains('cinema'));
+$('cineExit').onclick = ()=>setCinema(false);
+$('cinePrev').onclick = ()=>goStep(curStep-1);
+$('cineNext').onclick = ()=>goStep(curStep+1);
+$('cineVoice').onclick = ()=>$('voiceBtn').click();
+$('cineFull').onclick = ()=> document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+$('pcClose').onclick = clearPick;
+$('vIn').onclick = ()=>zoomBy(1/1.15);
+$('vOut').onclick = ()=>zoomBy(1.15);
+$('vReset').onclick = ()=>{ clearPick(); resumeAuto(); toast('已回到本步预设视角'); };
+$('vSpin').onclick = e=>{ view.spin = !view.spin; e.currentTarget.classList.toggle('on', view.spin); };
+syncPanelBtns();
+narrowMQ.addEventListener('change', syncPanelBtns);
+setTimeout(()=>toast('拖拽旋转 · 滚轮缩放 · 点结构看说明 · H/J 收起面板'), 900);
 
 /* 考核 */
 function openQuiz(){
@@ -1138,13 +1511,20 @@ $('helpClose').onclick = ()=>{ $('help').hidden = true; };
 
 /* 键盘 */
 addEventListener('keydown', e=>{
+  const k = e.key.toLowerCase();
   if(e.key==='ArrowRight') goStep(curStep+1);
   else if(e.key==='ArrowLeft') goStep(curStep-1);
   else if(/^[1-9]$/.test(e.key)) goStep(+e.key-1);
-  else if(e.key.toLowerCase()==='q') openQuiz();
-  else if(e.key.toLowerCase()==='f') $('fullBtn').click();
-  else if(e.key.toLowerCase()==='v') $('voiceBtn').click();
-  else if(e.key==='Escape'){ closeQuiz(); $('help').hidden = true; }
+  else if(k==='q') openQuiz();
+  else if(k==='f'){ e.preventDefault(); if(e.shiftKey){ document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } else setCinema(!document.body.classList.contains('cinema')); }
+  else if(k==='v') $('voiceBtn').click();
+  else if(k==='h') togglePanel('l');
+  else if(k==='j') togglePanel('r');
+  else if(k==='r'){ clearPick(); resumeAuto(); toast('已回到本步预设视角'); }
+  else if(e.key==='Escape'){
+    if(document.body.classList.contains('cinema')) setCinema(false);
+    else { closeQuiz(); $('help').hidden = true; clearPick(); }
+  }
 });
 
 /* 尺寸 */
@@ -1159,11 +1539,15 @@ addEventListener('resize', resize);
 /* 主循环 */
 let last = performance.now(), autoTimer = 0;
 function loop(now){
-  const dt = Math.min(.05, (now-last)/1000); last = now;
+  const raw = (now - last) / 1000; last = now;
+  const dt = Math.min(.05, raw);
+  lastDt = Math.min(.25, Math.max(.008, raw || .016));
   const k = Math.min(1, dt * 6 * speed);
   t += (targetT - t) * k;
   if(Math.abs(targetT - t) < .001) t = targetT;
   apply(t, now);
+  if(!view.auto) updateViewCamera(lastDt);
+  refreshSelBox();
   updateLabels();
   renderer.render(scene, camera);
   if(auto && Math.abs(t-targetT) < .01 && targetT < N-1 && !autoTimer){

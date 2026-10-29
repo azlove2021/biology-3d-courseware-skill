@@ -1,10 +1,20 @@
 # 高中生物 3D 课件交付标准（WorkBuddy 技能）
 
-把「铜匠实验室」54 门高中 3D 课件的公开设计语言，与 S-01 减数分裂的交付经验合并成一套可复用规范。v1.2 起版式从「六块面板」切换为**玻璃拟态教学驾驶舱**。
+把「铜匠实验室」54 门高中 3D 课件的公开设计语言，与 S-01 减数分裂的交付经验合并成一套可复用规范。v1.2 起版式从「六块面板」切换为**玻璃拟态教学驾驶舱**；v1.3 起补上**「能渲染」之外的能力门槛**。
 
 - 📦 技能仓库：<https://github.com/azlove2021/biology-3d-courseware-skill>
 - 🌐 技能主页（GitHub Pages）：<https://azlove2021.github.io/biology-3d-courseware-skill/>
 - 🧬 样板课：<https://azlove2021.github.io/biology-3d-courseware-skill/demo/gene-expression/>
+
+## v1.3 的关键变化：从「能渲染」到「能用」
+
+v1.2 的样板课通过了全部自动检查，但学生**转不动、缩放不了、点结构没反应，讲解卡片也收不起来**——这是「验收只测渲染、不测使用」的必然结果。v1.3 把三件事定为交付底线：
+
+1. **3D 必须可交互**：拖拽旋转 / 滚轮缩放 / 右键平移 / **单击结构弹信息卡** / 双击聚焦 / `R` 回预设；用户接管视角后本步不抢镜，切步回预设
+2. **讲解面板必须可隐藏**：`H` 左栏 / `J` 右栏 / `F` 影院（全隐只留胶囊）/ `Shift+F` 全屏；窄屏改抽屉，不许 `display:none` 后无入口
+3. **Tabbit 真机验收必做**：登录态真实浏览器跑「旋转→缩放→逐个点选→三档折叠→影院→语音真声→考核判分→断网→4 种分辨率」，逐步截图；无头 Playwright 只做回归
+
+真机验收立刻抓到一个无头测试测不出的真 bug：**150% 系统缩放下 `setSize(w,h,false)` 让画布按设备像素布局**——画面放大 1.5 倍被裁切、点选坐标映射全错（这正是「点不中 RNA」的根因）。已修复，并加入校验脚本作为阻断项。
 
 ## v1.2 的关键变化
 
@@ -44,16 +54,16 @@ C:\Users\<你的用户名>\.workbuddy-ai\skills\biology-3d-courseware\
 | `references/terms.md` | 术语口径与禁用表述速查 |
 | `references/courseware-types.md` | 四类课件范式与差异 |
 | `references/courseware-profile.md` | 配置字段、豁免规则、发布方式 |
+| `references/interaction-contract.md` | 3D 轨道/缩放/点选代码、面板三档折叠、结构速查 |
+| `references/browser-testing.md` | Tabbit 真机全流程验收（命令 + 判定 + 截图） |
 | `references/runtime-contract.md` | 离线契约、参数契约、浏览器验证 |
 | `references/local-config.md` | 本地知识库配置与取材顺序 |
 | `references/threejs-version.md` | three.js 依赖记录、许可证、升级回归 |
-| `references/delivery-checklist.md` | 交付前逐条勾选（A–J 十组） |
+| `references/delivery-checklist.md` | 交付前逐条勾选（A–J 十二组） |
 | `scripts/check_courseware.py` | 三层校验：静态结构 / 数据一致性 / 浏览器运行 |
-| `scripts/smoke_test.py` | 可选 Playwright 冒烟测试（未安装时 SKIP） |
-| `tests/test_checker.py` | 校验脚本的故障样例回归（12 个用例） |
+| `scripts/smoke_test.py` | Playwright 交互冒烟：旋转/缩放/点选/折叠/影院/断网 |
+| `tests/test_checker.py` | 校验脚本的故障样例回归（18 个用例） |
 | `assets/courseware-shell.html` | v1.1 旧版外壳（六块面板，兼容参考） |
-| `demo/gene-expression/` | v1.2 驾驶舱样板（可直接复制改内容） |
-| `assets/courseware-profile.example.json` | 配置样例 |
 | `demo/gene-expression/` | 样板课：基因的表达（单 HTML + 截图 + 文档） |
 | `index.html` | 技能主页（GitHub Pages 根地址） |
 
