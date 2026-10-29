@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>课件外壳模板 · 高中生物 3D 课件</title>
+<style>
+  :root{
+    --red:#ef4444; --blue:#3b82f6; --purple:#7c3aed; --cyan:#06b6d4; --orange:#f59e0b;
+    --ink:#1e293b; --muted:#64748b; --line:#e2e8f0;
+    --accent:#7c3aed; --accent2:#06b6d4;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;color:var(--ink);overflow:hidden;font:14px/1.7 "Microsoft YaHei","PingFang SC",sans-serif;background:#f6f9ff}
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .bg::before{content:'';position:absolute;inset:-20%;background:
+    radial-gradient(38% 42% at 16% 12%,rgba(196,181,253,.55),transparent 70%),
+    radial-gradient(42% 46% at 86% 18%,rgba(125,211,252,.55),transparent 72%),
+    radial-gradient(46% 50% at 74% 88%,rgba(167,243,208,.42),transparent 72%),
+    radial-gradient(40% 44% at 10% 84%,rgba(251,207,232,.40),transparent 72%),
+    linear-gradient(135deg,#fbfdff 0%,#f2f7ff 45%,#f6fbff 100%)}
+  .bg::after{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(99,102,241,.20) 1px,transparent 1px);background-size:22px 22px;opacity:.55;
+    mask-image:radial-gradient(ellipse 75% 65% at 50% 45%,#000 30%,transparent 78%);
+    -webkit-mask-image:radial-gradient(ellipse 75% 65% at 50% 45%,#000 30%,transparent 78%)}
+  .blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;animation:float 18s ease-in-out infinite}
+  .blob.b1{width:420px;height:420px;left:-120px;top:-140px;background:#ddd6fe}
+  .blob.b2{width:360px;height:360px;right:-100px;top:6%;background:#bae6fd;animation-delay:-6s}
+  .blob.b3{width:320px;height:320px;left:38%;bottom:-160px;background:#bbf7d0;animation-delay:-11s}
+  @keyframes float{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(18px,-22px,0) scale(1.06)}}
+
+  #app{position:relative;z-index:1;height:100%;display:flex;flex-direction:column}
+  header{display:flex;align-items:center;gap:14px;padding:11px 20px;background:rgba(255,255,255,.72);
+    border-bottom:1px solid rgba(226,232,240,.9);backdrop-filter:blur(14px);flex-wrap:wrap}
+  .mark{width:34px;height:34px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    box-shadow:0 6px 16px rgba(124,58,237,.28);display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px}
+  .titles{display:flex;flex-direction:column;line-height:1.25}
+  .titles h1{margin:0;font-size:18px;letter-spacing:.3px}
+  .titles small{color:var(--muted);font-size:11.5px}
+  .badge{font-size:11.5px;color:var(--accent);background:#f5f3ff;border:1px solid #e9d5ff;padding:2px 9px;border-radius:999px;white-space:nowrap}
+  header .sp{flex:1}
+  .hbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#475569;background:#fff;
+    border:1px solid var(--line);padding:6px 11px;border-radius:10px;cursor:pointer;transition:.15s}
+  .hbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .hbtn.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+
+  main{flex:1;display:flex;min-height:0}
+  #stage{position:relative;flex:1;min-width:0;overflow:hidden}
+  #stage canvas{display:block}
+  #labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .clabel{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font-size:11.5px;font-weight:600;
+    color:#5b21b6;background:rgba(255,255,255,.88);border:1px solid #ddd6fe;padding:2px 8px;border-radius:999px;
+    box-shadow:0 3px 10px rgba(91,33,182,.10)}
+  .hud{position:absolute;pointer-events:none;font-size:11.5px;color:#475569}
+  .hud.tl{left:18px;top:16px;display:flex;flex-direction:column;gap:2px}
+  .hud.tl b{font-size:12.5px;color:#334155;letter-spacing:.3px}
+  .hud.tl span{color:#94a3b8}
+  .hud.tr{right:18px;top:16px;text-align:right}
+  .hud.bl{left:18px;bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .hud.bl span{display:inline-flex;align-items:center;gap:5px}
+  .hud.bl em{width:9px;height:9px;border-radius:3px;display:inline-block;font-style:normal}
+  .hud.br{right:18px;bottom:14px;color:#94a3b8}
+  .hud .chip{display:inline-block;font-size:10.5px;color:#64748b;background:rgba(255,255,255,.8);border:1px solid #e2e8f0;border-radius:999px;padding:2px 8px}
+  .lg-note{color:#94a3b8;font-size:10.5px}
+
+  .rail{position:absolute;left:50%;top:14px;transform:translateX(-50%);display:flex;gap:4px;padding:4px;border-radius:12px;
+    background:rgba(255,255,255,.78);border:1px solid rgba(226,232,240,.95);box-shadow:0 6px 20px rgba(30,41,59,.07);
+    backdrop-filter:blur(10px);z-index:3}
+  .rail button{border:0;background:transparent;cursor:pointer;color:#64748b;font-size:11.5px;padding:5px 9px;border-radius:8px;transition:.15s;white-space:nowrap}
+  .rail button:hover{background:#f1f5f9;color:var(--accent)}
+  .rail button.on{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 12px rgba(124,58,237,.28);font-weight:700}
+  .rail .sep{width:1px;background:#e2e8f0;margin:4px 3px}
+
+  aside{width:372px;flex-shrink:0;overflow-y:auto;padding:12px;background:rgba(255,255,255,.80);
+    border-left:1px solid rgba(226,232,240,.95);backdrop-filter:blur(12px)}
+  aside::-webkit-scrollbar{width:8px}
+  aside::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:9px;box-shadow:0 5px 18px rgba(30,41,59,.055)}
+  .eyebrow{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#94a3b8;letter-spacing:.6px}
+  .eyebrow b{color:var(--accent);font-weight:700}
+  .stageName{font-size:21px;font-weight:800;margin:5px 0 1px;letter-spacing:.4px}
+  .stageSub{font-size:12px;color:var(--muted);margin:0 0 8px}
+  .narration{margin:0;font-size:12.5px;line-height:1.75;color:#334155;padding-left:10px;border-left:3px solid #e9d5ff}
+  .voice-row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .vbtn{display:inline-flex;align-items:center;gap:5px;border:1px solid #ddd6fe;background:#faf5ff;color:#6d28d9;font-size:12px;padding:5px 10px;border-radius:9px;cursor:pointer}
+  .vbtn:hover{background:#f3e8ff}
+  .vbtn.playing{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+  .voice-row label{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+  .voice-row input[type=checkbox]{accent-color:var(--accent)}
+  .voice-row select{font-size:11.5px;border:1px solid var(--line);border-radius:7px;padding:2px 4px;color:#475569;background:#fff}
+  .vhint{font-size:11px;color:#94a3b8}
+
+  .counts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;text-align:center}
+  .counts div{border-radius:11px;padding:7px 3px;color:#fff;position:relative;overflow:hidden}
+  .counts b{display:block;font-size:20px;line-height:1.2;position:relative;z-index:1}
+  .counts span{font-size:10.5px;opacity:.95;position:relative;z-index:1}
+  .c1{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
+  .c2{background:linear-gradient(135deg,#22d3ee,#0891b2)}
+  .c3{background:linear-gradient(135deg,#fbbf24,#d97706)}
+  .cnote{font-size:11px;color:var(--muted);margin-top:7px}
+  .scope-row{display:flex;justify-content:space-between;gap:8px;margin-top:7px;font-size:11px;color:#64748b;
+    background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:4px 8px}
+  .scope-row b{color:var(--accent);font-weight:700}
+
+  .chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .chart-head b{font-size:12.5px}
+  .chart-legend{display:flex;gap:9px;font-size:10.5px;color:var(--muted)}
+  .chart-legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:3px;vertical-align:2px}
+  #chart{width:100%;height:96px;display:block}
+
+  .card h3{margin:0 0 6px;font-size:12.5px;letter-spacing:.3px;color:#334155}
+  .feat{margin:0;padding-left:16px;font-size:12.5px;color:#334155}
+  .feat-box{margin-top:9px;border-top:1px dashed #e9d5ff;padding-top:7px}
+  .feat-box summary{cursor:pointer;font-size:12px;color:#6d28d9;font-weight:600;list-style:none;outline:none}
+  .feat-box summary::-webkit-details-marker{display:none}
+  .warn{border-left:4px solid var(--orange);background:linear-gradient(180deg,#fffdf7,#fffbeb)}
+  .warn h3{color:#b45309}
+  .warn p{margin:0;font-size:12.5px;color:#78350f}
+  .task{background:linear-gradient(180deg,#f7fffd,#effcf9);border-left:4px solid #10b981}
+  .task h3{color:#047857}
+  .task p{margin:0;font-size:12.5px;color:#065f46}
+
+  footer{padding:9px 16px 12px;background:rgba(255,255,255,.86);border-top:1px solid rgba(226,232,240,.95);backdrop-filter:blur(12px)}
+  .bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .btn{padding:6px 13px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:12.5px;color:#334155;transition:.15s}
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;box-shadow:0 5px 14px rgba(124,58,237,.24)}
+  .scrub-wrap{flex:1;min-width:180px;position:relative;display:flex;align-items:center;gap:8px}
+  input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+  .chk{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--muted);cursor:pointer}
+  .chk input{accent-color:var(--red);width:14px;height:14px}
+  .spd{font-size:11.5px;color:#94a3b8}
+
+  body.simple .blob{display:none}
+  body.simple .bg::after{display:none}
+  body.simple .bg::before{background:#f8fbff}
+  body.simple .card{box-shadow:none}
+
+  @media(max-width:1180px){aside{width:330px}.rail button{padding:5px 7px;font-size:11px}}
+  @media(max-width:980px){
+    main{flex-direction:column;min-height:0}
+    #stage{flex:1 1 auto;min-height:42vh}
+    aside{display:block;position:static;width:auto;max-height:46vh;border-left:0;border-top:1px solid var(--line);box-shadow:none}
+    .hud.br{display:none}
+    .rail{max-width:calc(100% - 24px);overflow-x:auto}
+  }
+</style>
+</head>
+<body>
+<div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+
+<div id="app">
+  <header>
+    <div class="mark">S0</div>
+    <div class="titles">
+      <h1>课件标题 · 副标题</h1>
+      <small>人教版 2019 · 必修X 第X章 · 示意</small>
+    </div>
+    <span class="badge">交互式三维课件</span>
+    <span class="sp"></span>
+    <button class="hbtn on" id="voiceToggle">🔊 语音讲解</button>
+    <button class="hbtn" id="simpleBtn">◐ 简洁模式</button>
+    <button class="hbtn" id="fullBtn">⛶ 全屏</button>
+    <button class="hbtn" id="resetAll">⟲ 重置课件</button>
+  </header>
+
+  <main>
+    <div id="stage">
+      <div id="labels"></div>
+      <div class="rail" id="rail"></div>
+      <div class="hud tl"><b>示意模型 · 非真实比例</b><span>起点 → 终点</span></div>
+      <div class="hud tr"><span class="chip">示意 · 非真实比例</span></div>
+      <div class="hud bl">
+        <span><em style="background:#ef4444"></em>结构 A</span>
+        <span><em style="background:#3b82f6"></em>结构 B</span>
+        <span class="lg-note">颜色仅用于区分结构</span>
+      </div>
+      <div class="hud br">拖拽旋转 · 滚轮缩放</div>
+    </div>
+
+    <aside>
+      <div class="card">
+        <div class="eyebrow"><span>STEP <b id="stepNo">01 / 03</b></span><span id="phaseTag">阶段</span></div>
+        <div class="stageName" id="sName">阶段名</div>
+        <div class="stageSub" id="sSub">副标题</div>
+        <p class="narration" id="sVoice">旁白</p>
+        <div class="voice-row">
+          <button class="vbtn" id="speakBtn">▶ 朗读本段</button>
+          <label><input type="checkbox" id="autoVoice" checked> 自动朗读</label>
+          <select id="rate"><option value="0.9">0.9×</option><option value="1" selected>1×</option><option value="1.15">1.15×</option></select>
+          <span class="vhint" id="vhint"></span>
+        </div>
+        <div class="vhint" style="margin-top:4px">开启语音时，讲完一段再进入下一阶段。</div>
+      </div>
+
+      <div class="card">
+        <div class="counts">
+          <div class="c1"><b id="nA">4</b><span>数量 A</span></div>
+          <div class="c2"><b id="nB">4</b><span>数量 B</span></div>
+          <div class="c3"><b id="nC">0</b><span>数量 C</span></div>
+        </div>
+        <div class="cnote" id="cNote">数量关系说明</div>
+        <div class="scope-row"><span>细胞数 <b id="nCell">1</b></span><span>口径 <b id="scope">每个细胞</b></span></div>
+      </div>
+
+      <div class="card">
+        <div class="chart-head"><b>数量变化</b>
+          <div class="chart-legend"><span><i style="background:#7c3aed"></i>A</span><span><i style="background:#06b6d4"></i>B</span><span><i style="background:#f59e0b"></i>C</span></div>
+        </div>
+        <canvas id="chart"></canvas>
+      </div>
+
+      <div class="card"><h3>本时期要点</h3><details class="feat-box"><summary>展开要点</summary><ul class="feat" id="sFeat"></ul></details></div>
+      <div class="card warn"><h3>易错点</h3><p id="sWarn"></p></div>
+      <div class="card task"><h3>观察任务</h3><p id="sQ"></p></div>
+    </aside>
+  </main>
+
+  <footer>
+    <div class="bar">
+      <button class="btn primary" id="play">▶ 播放</button>
+      <button class="btn" id="prev">上一</button>
+      <button class="btn" id="next">下一</button>
+      <div class="scrub-wrap"><input type="range" id="scrub" min="0" max="100" value="0"><span class="spd" id="spd">0.85×</span></div>
+      <label class="chk"><input type="checkbox" id="xo"> 关键开关</label>
+      <span class="spd">速度</span><input type="range" id="speed" min="40" max="140" value="85" style="width:90px">
+    </div>
+  </footer>
+</div>
+
+<script src="libs/three.min.js"></script>
+<script>if(!window.THREE){document.write('<script src="https://unpkg.com/three@0.128.0/build/three.min.js"><\/script>');}</script>
+<script>
+/* ============ 外壳模板：替换 STAGES / 建模 / 文案即可 ============ */
+const $ = id => document.getElementById(id);
+
+/* ---------- 数据 ---------- */
+const STAGES = [
+  { n:'阶段一', short:'一', phase:'阶段组', s:'一句话概括', tb:'必修X 第X章 第X节',
+    v:'这是第一阶段的旁白，口语化，读完约十到二十秒。', f:['要点一','要点二'],
+    c:[4,4,0], cells:1, scope:'每个细胞', cn:'数量关系说明一',
+    w:'易错点一：要具体，不写空话。', q:'观察：在画面上找到……' },
+  { n:'阶段二', short:'二', phase:'阶段组', s:'一句话概括', tb:'必修X 第X章 第X节',
+    v:'这是第二阶段的旁白，画面会停在当前阶段，讲完才进入下一阶段。', f:['要点一','要点二'],
+    c:[4,8,8], cells:1, scope:'每个细胞', cn:'数量关系说明二',
+    w:'易错点二。', q:'观察：比较与上一阶段的差别。' },
+  { n:'阶段三', short:'三', phase:'阶段组', s:'一句话概括', tb:'必修X 第X章 第X节',
+    v:'这是第三阶段的旁白，讲完后播放结束。', f:['要点一','要点二'],
+    c:[2,2,0], cells:2, scope:'每个子细胞', cn:'数量关系说明三',
+    w:'易错点三。', q:'观察：最终形成几个结构？' }
+];
+const SERIES = [
+  { color:'#7c3aed', data: STAGES.map(s => s.c[0]) },
+  { color:'#06b6d4', data: STAGES.map(s => s.c[1]) },
+  { color:'#f59e0b', data: STAGES.map(s => s.c[2]) }
+];
+const POS = [
+  [[-1.2,.6,0],[1.2,.6,0],[-1.2,-.6,0],[1.2,-.6,0]],
+  [[-1.6,0,0],[1.6,0,0],[-1.6,-1.2,0],[1.6,-1.2,0]],
+  [[-2.4,0,0],[-2.4,-1.2,0],[2.4,0,0],[2.4,-1.2,0]]
+];
+const FRAME = [7.2,7.4,8.0];
+
+/* ---------- three ---------- */
+const stageEl = $('stage');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(42, 1, .1, 100);
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+stageEl.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0xdfe8ff, .95));
+const dl = new THREE.DirectionalLight(0xffffff, .75); dl.position.set(4,6,5); scene.add(dl);
+const dl2 = new THREE.DirectionalLight(0xa5b4fc, .35); dl2.position.set(-5,-2,-4); scene.add(dl2);
+
+const group = new THREE.Group(); scene.add(group);
+const balls = [];
+for(let i=0;i<4;i++){
+  const color = i<2 ? 0xef4444 : 0x3b82f6;
+  const m = new THREE.Mesh(new THREE.SphereGeometry(.42, 28, 20),
+    new THREE.MeshStandardMaterial({ color, roughness:.35, metalness:.05 }));
+  m.userData.target = new THREE.Vector3(...POS[0][i]);
+  group.add(m); balls.push(m);
+}
+
+/* ---------- 相机 ---------- */
+const cam = { theta:.35, phi:1.22, r:7.2, rGoal:7.2, tgt:new THREE.Vector3(), tgtGoal:new THREE.Vector3() };
+function applyCam(){
+  camera.position.set(
+    cam.r * Math.sin(cam.phi) * Math.sin(cam.theta),
+    cam.r * Math.cos(cam.phi),
+    cam.r * Math.sin(cam.phi) * Math.cos(cam.theta)
+  );
+  camera.lookAt(cam.tgt);
+}
+let dragging=false, px=0, py=0;
+renderer.domElement.addEventListener('pointerdown', e=>{ dragging=true; px=e.clientX; py=e.clientY; });
+addEventListener('pointerup', ()=> dragging=false);
+addEventListener('pointermove', e=>{
+  if(!dragging) return;
+  cam.theta -= (e.clientX-px)*.006;
+  cam.phi = Math.min(2.1, Math.max(.35, cam.phi - (e.clientY-py)*.005));
+  px=e.clientX; py=e.clientY;
+});
+renderer.domElement.addEventListener('wheel', e=>{
+  e.preventDefault();
+  cam.rGoal = Math.min(16, Math.max(3.6, cam.rGoal + Math.sign(e.deltaY)*.6));
+}, { passive:false });
+
+/* ---------- 状态 ---------- */
+let t=0, playing=false, speed=.85, stageIdx=-1;
+function apply(tt){
+  const i0 = Math.max(0, Math.min(STAGES.length-1, Math.floor(tt)));
+  const i1 = Math.max(0, Math.min(STAGES.length-1, Math.ceil(tt)));
+  const k = tt - Math.floor(tt);
+  balls.forEach((b,i)=>{
+    b.userData.target.set(
+      POS[i0][i][0] + (POS[i1][i][0]-POS[i0][i][0])*k,
+      POS[i0][i][1] + (POS[i1][i][1]-POS[i0][i][1])*k,
+      POS[i0][i][2] + (POS[i1][i][2]-POS[i0][i][2])*k
+    );
+    b.position.lerp(b.userData.target, .18);
+  });
+  const idx = Math.round(tt);
+  if(idx !== stageIdx) setStageUI(idx);
+}
+
+function setStageUI(idx){
+  if(synth) synth.cancel();
+  stageIdx = idx;
+  const st = STAGES[idx];
+  $('stepNo').textContent = String(idx+1).padStart(2,'0') + ' / ' + String(STAGES.length).padStart(2,'0');
+  $('phaseTag').textContent = st.phase;
+  $('sName').textContent = st.n;
+  $('sSub').textContent = st.s + ' · 教材依据：' + st.tb;
+  $('sVoice').textContent = st.v;
+  $('sFeat').innerHTML = st.f.map(x=>'<li>'+x+'</li>').join('');
+  $('nA').textContent = st.c[0]; $('nB').textContent = st.c[1]; $('nC').textContent = st.c[2];
+  $('cNote').textContent = st.cn; $('nCell').textContent = st.cells; $('scope').textContent = st.scope;
+  $('sWarn').textContent = st.w; $('sQ').textContent = st.q;
+  document.querySelectorAll('#rail button').forEach((b,k)=>b.classList.toggle('on',k===idx));
+  cam.rGoal = FRAME[idx];
+  drawChart(idx);
+  if(autoVoice.checked && voiceReady && synth){
+    if(playing) speak(st.v);
+    else { clearTimeout(speakTimer); speakTimer = setTimeout(()=>{ if(!playing) speak(st.v); }, 420); }
+  }
+}
+
+/* ---------- 图表 ---------- */
+const chart = $('chart');
+function drawChart(idx){
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  const w = chart.clientWidth || 320, h = 96;
+  chart.width = w*dpr; chart.height = h*dpr;
+  const ctx = chart.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  const pad = 8, n = SERIES[0].data.length;
+  const max = Math.max(...SERIES.flatMap(s=>s.data), 1);
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for(let g=0; g<=3; g++){
+    const y = pad + (h-2*pad)*g/3;
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(w-pad,y); ctx.stroke();
+  }
+  SERIES.forEach(s=>{
+    ctx.beginPath(); ctx.strokeStyle = s.color; ctx.lineWidth = 2;
+    s.data.forEach((v,i)=>{
+      const x = pad + (w-2*pad)*(n===1?0:i/(n-1));
+      const y = h-pad - (h-2*pad)*(v/max);
+      i ? ctx.lineTo(x,y) : ctx.moveTo(x,y);
+    });
+    ctx.stroke();
+  });
+  const x = pad + (w-2*pad)*(n===1?0:idx/(n-1));
+  ctx.strokeStyle = '#c4b5fd'; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(x,pad); ctx.lineTo(x,h-pad); ctx.stroke(); ctx.setLineDash([]);
+}
+
+/* ---------- 语音（hold → 朗读 → morph） ---------- */
+const synth = window.speechSynthesis;
+const autoVoice = $('autoVoice'), rateSel = $('rate'), speakBtn = $('speakBtn');
+let voiceReady=false, zhVoice=null, speaking=false, speakTimer=0, speakToken=0;
+function effectiveRate(){
+  const base = parseFloat(rateSel.value) || 1;
+  return Math.min(1.4, Math.max(.6, base * (speed/.85)));
+}
+function estVoiceDur(text){ return Math.max(3.2, text.length/(4.8*effectiveRate()) + .6); }
+function loadVoices(){
+  if(!synth) return;
+  const vs = synth.getVoices();
+  zhVoice = vs.find(v=>/zh[-_]?CN|Chinese|中文|普通话/i.test(v.lang+' '+v.name)) || vs.find(v=>/^zh/i.test(v.lang)) || null;
+  $('vhint').textContent = vs.length ? (zhVoice ? '' : '未找到中文语音') : '语音加载中';
+}
+if(synth){ loadVoices(); synth.onvoiceschanged = loadVoices; }
+else { $('vhint').textContent = '浏览器不支持语音'; speakBtn.disabled = true; }
+
+function speak(text){
+  if(!synth) return;
+  const my = ++speakToken;
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='zh-CN'; u.rate=effectiveRate(); u.pitch=1;
+  if(zhVoice) u.voice = zhVoice;
+  u.onstart = ()=>{ if(my!==speakToken) return; speaking=true; speakBtn.classList.add('playing'); speakBtn.textContent='⏸ 朗读中'; };
+  u.onend = u.onerror = ()=>{ if(my!==speakToken) return; speaking=false; speakBtn.classList.remove('playing'); speakBtn.textContent='▶ 朗读本段'; };
+  synth.speak(u);
+}
+speakBtn.onclick = ()=>{ voiceReady=true; if(speaking){ synth.cancel(); return; } speak(STAGES[stageIdx].v); };
+document.addEventListener('pointerdown', ()=>{ voiceReady=true; }, { once:true });
+$('voiceToggle').onclick = e=>{
+  const on = !autoVoice.checked; autoVoice.checked = on;
+  e.currentTarget.classList.toggle('on', on);
+  e.currentTarget.textContent = on ? '🔊 语音讲解' : '🔇 语音关闭';
+  if(!on && synth) synth.cancel();
+  else if(on && voiceReady) speak(STAGES[stageIdx].v);
+};
+
+/* ---------- 播放 ---------- */
+const scrub = $('scrub'), playBtn = $('play');
+function setPlay(){ playBtn.textContent = playing ? '⏸ 暂停' : '▶ 播放'; }
+scrub.addEventListener('input', ()=>{ t = scrub.value/100*(STAGES.length-1); playing=false; setPlay(); if(synth) synth.cancel(); apply(t); });
+$('speed').addEventListener('input', e=>{ speed = e.target.value/100; $('spd').textContent = speed.toFixed(2)+'×'; });
+playBtn.onclick = ()=>{
+  if(t >= STAGES.length-1){ t=0; stageIdx=-1; apply(0); }
+  playing = !playing; voiceReady = true;
+  phase='hold'; morphT=0; clearTimeout(speakTimer);
+  if(playing){
+    if(stageIdx<0) stageIdx = Math.round(t);
+    if(autoVoice.checked && synth) speak(STAGES[stageIdx].v);
+  } else if(synth){ synth.cancel(); }
+  setPlay();
+};
+$('prev').onclick = ()=>{ t=Math.max(0,Math.round(t)-1); playing=false; setPlay(); apply(t); };
+$('next').onclick = ()=>{ t=Math.min(STAGES.length-1,Math.round(t)+1); playing=false; setPlay(); apply(t); };
+$('xo').onchange = ()=> apply(t);
+$('simpleBtn').onclick = e=>{
+  const on = document.body.classList.toggle('simple');
+  e.currentTarget.classList.toggle('on', on);
+  e.currentTarget.textContent = on ? '◑ 关闭简洁' : '◐ 简洁模式';
+};
+$('fullBtn').onclick = ()=> document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+$('resetAll').onclick = ()=>{ t=0; playing=false; stageIdx=-1; setPlay(); if(synth) synth.cancel(); cam.theta=.35; cam.phi=1.22; cam.rGoal=FRAME[0]; apply(0); };
+
+/* ---------- 循环 ---------- */
+let phase='hold', morphT=0, morphFrom=0, morphTo=0;
+const easeIO = x => x<.5 ? 2*x*x : 1-Math.pow(-2*x+2,2)/2;
+function enterStage(i){ if(i!==stageIdx) setStageUI(i); phase='hold'; }
+
+let last = performance.now();
+(function loop(now){
+  const dt = Math.min(.05, (now-last)/1000); last = now;
+  if(playing){
+    const voiceMode = autoVoice.checked && voiceReady && synth;
+    if(voiceMode){
+      if(phase === 'hold'){
+        t = stageIdx; apply(t);
+        if(!speaking){
+          if(stageIdx < STAGES.length-1){
+            phase='morph'; morphFrom=stageIdx; morphTo=stageIdx+1; morphT=0; cam.rGoal=FRAME[morphTo];
+          } else { playing=false; setPlay(); }
+        }
+      } else {
+        const md = Math.max(.7, 1.7/Math.max(.4, effectiveRate()));
+        morphT += dt/md;
+        const k = Math.min(1, morphT);
+        t = morphFrom + (morphTo-morphFrom)*easeIO(k);
+        apply(t);
+        if(k>=1) enterStage(morphTo);
+      }
+    } else {
+      t += dt*(speed*.22);
+      if(t >= STAGES.length-1){ t = STAGES.length-1; playing=false; setPlay(); }
+      apply(t);
+    }
+  }
+  scrub.value = Math.round(t/(STAGES.length-1)*100);
+  balls.forEach(b=> b.position.lerp(b.userData.target, .18));
+  cam.r += (cam.rGoal-cam.r)*Math.min(1,dt*3.2);
+  cam.tgt.lerp(cam.tgtGoal, Math.min(1,dt*3.2));
+  applyCam();
+  renderer.render(scene, camera);
+  requestAnimationFrame(loop);
+})(last);
+
+/* ---------- 尺寸 / 参数 ---------- */
+function resize(){
+  const w = stageEl.clientWidth, h = stageEl.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w/h; camera.updateProjectionMatrix();
+  drawChart(stageIdx<0?0:stageIdx);
+}
+addEventListener('resize', resize);
+
+/* 顶部导航 */
+const rail = $('rail');
+STAGES.forEach((s,i)=>{
+  const b = document.createElement('button');
+  b.textContent = s.short;
+  b.onclick = ()=>{ t=i; playing=false; setPlay(); if(synth) synth.cancel(); apply(i); };
+  rail.appendChild(b);
+});
+
+const q = new URLSearchParams(location.search);
+if(q.has('t')) t = Math.min(STAGES.length-1, Math.max(0, parseFloat(q.get('t'))||0));
+if(q.get('voice') === '0'){ autoVoice.checked=false; $('voiceToggle').classList.remove('on'); $('voiceToggle').textContent='🔇 语音关闭'; }
+if(q.get('simple') === '1') $('simpleBtn').click();
+resize(); apply(t);
+</script>
+</body>
+</html>
